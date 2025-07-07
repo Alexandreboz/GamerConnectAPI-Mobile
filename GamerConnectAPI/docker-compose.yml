@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  gamerconnect-mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: GamerConnect
+      MYSQL_USER: gameruser
+      MYSQL_PASSWORD: gamerpass
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  gamerconnect-api:
+    build: ./GamerConnectAPI
+    ports:
+      - "3000:3000"
+    depends_on:
+      gamerconnect-mysql:
+        condition: service_healthy

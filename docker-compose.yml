@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: gamerconnect-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: GamerConnect
+      MYSQL_USER: gameruser
+      MYSQL_PASSWORD: gamerpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./gamerconnect.sql:/docker-entrypoint-initdb.d/init.sql
+
+  api:
+    build: ./GamerConnectAPI
+    container_name: gamerconnect-api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  flutter:
+    build: ./GamerConnectMobile
+    container_name: gamerconnect-mobile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./GamerConnectMobile:/app
+    environment:
+      - API_URL=http://localhost:3000
+    command: /bin/sh -c "flutter pub get && flutter run -d web-server --web-port=8080"
