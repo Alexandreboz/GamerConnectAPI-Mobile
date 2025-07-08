@@ -14,12 +14,12 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
-    if (index == 3) {
+    if (index == 1) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => ProfilPage()),
       );
-    } else if (index == 1) {
+    } else if (index == 0) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => GroupesPage()),
@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _menuCard('Actu', 'assets/images/actu.png', Colors.red),
-                    _menuCard('Eventments', 'assets/images/event.png', Colors.purple),
+                    //_menuCard('Eventments', 'assets/images/event.png', Colors.purple),
                     _menuCard('Succes', 'assets/images/succes.png', Colors.teal),
                   ],
                 ),

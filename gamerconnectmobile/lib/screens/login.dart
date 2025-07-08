@@ -111,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             SizedBox(height: 20),
             Text(
-              "C'est gratuit et facile... En savoir plus sur Steam",
+              "C'est gratuit et facile...",
               style: TextStyle(color: Colors.white70),
               textAlign: TextAlign.center,
             )
