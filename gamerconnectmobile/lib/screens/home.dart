@@ -100,9 +100,7 @@ class _HomePageState extends State<HomePage> {
         onTap: _onItemTapped,
         currentIndex: _selectedIndex,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.notifications), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: ''), // ✅ redirige vers groupes
-          BottomNavigationBarItem(icon: Icon(Icons.notifications_none), label: ''),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
