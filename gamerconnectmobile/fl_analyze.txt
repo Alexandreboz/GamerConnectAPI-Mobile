@@ -1,0 +1,54 @@
+﻿Analyzing gamerconnectmobile...                                 
+
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\actu_detail_page.dart:11:9 - use_key_in_widget_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\actu_page.dart:6:7 - use_key_in_widget_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\actu_page.dart:79:34 - prefer_const_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\discussion_groupe_page.dart:12:3 - use_key_in_widget_constructors
+   info - Constructors in '@immutable' classes should be declared as 'const' - lib\screens\discussion_groupe_page.dart:12:3 - prefer_const_constructors_in_immutables
+   info - Invalid use of a private type in a public API - lib\screens\discussion_groupe_page.dart:15:3 - library_private_types_in_public_api
+   info - Don't invoke 'print' in production code - lib\screens\discussion_groupe_page.dart:46:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\screens\discussion_groupe_page.dart:61:33 - avoid_print
+   info - Don't invoke 'print' in production code - lib\screens\discussion_groupe_page.dart:77:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\screens\discussion_groupe_page.dart:93:7 - avoid_print
+   info - Use 'const' for final variables initialized to a constant value - lib\screens\discussion_groupe_page.dart:100:5 - prefer_const_declarations
+   info - Don't invoke 'print' in production code - lib\screens\discussion_groupe_page.dart:128:7 - avoid_print
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\evenement_page.dart:7:7 - use_key_in_widget_constructors
+   info - Invalid use of a private type in a public API - lib\screens\evenement_page.dart:9:3 - library_private_types_in_public_api
+   info - Use 'const' for final variables initialized to a constant value - lib\screens\evenement_page.dart:23:5 - prefer_const_declarations
+   info - Use 'const' with the constructor to improve performance - lib\screens\evenement_page.dart:84:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\evenement_page.dart:109:32 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\evenement_page.dart:111:34 - prefer_const_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\groupes_page.dart:9:7 - use_key_in_widget_constructors
+   info - Invalid use of a private type in a public API - lib\screens\groupes_page.dart:11:3 - library_private_types_in_public_api
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\home.dart:10:7 - use_key_in_widget_constructors
+   info - Invalid use of a private type in a public API - lib\screens\home.dart:12:3 - library_private_types_in_public_api
+   info - The private field _selectedIndex could be 'final' - lib\screens\home.dart:16:7 - prefer_final_fields
+warning - The value of the field '_selectedIndex' isn't used - lib\screens\home.dart:16:7 - unused_field
+   info - Use 'const' with the constructor to improve performance - lib\screens\home.dart:191:60 - prefer_const_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\login.dart:10:7 - use_key_in_widget_constructors
+   info - Invalid use of a private type in a public API - lib\screens\login.dart:12:3 - library_private_types_in_public_api
+   info - Use 'const' for final variables initialized to a constant value - lib\screens\login.dart:40:5 - prefer_const_declarations
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\profil.dart:5:7 - use_key_in_widget_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\register_page.dart:9:7 - use_key_in_widget_constructors
+   info - Invalid use of a private type in a public API - lib\screens\register_page.dart:11:3 - library_private_types_in_public_api
+   info - Use 'const' for final variables initialized to a constant value - lib\screens\register_page.dart:74:5 - prefer_const_declarations
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\succes_page.dart:5:7 - use_key_in_widget_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\succes_page.dart:69:32 - prefer_const_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\welcome.dart:7:7 - use_key_in_widget_constructors
+
+flutter : 35 issues found. 
+(ran in 1.5s)
+Au caractère Ligne:1 : 1
++ flutter analyze 2>&1 | 
+Out-File -FilePath 
+fl_analyze.txt -Encoding UT 
+...
++ ~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (35 issu  
+  es found. (ran in 1.5s):   
+ String) [], RemoteExcept    
+ion
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 

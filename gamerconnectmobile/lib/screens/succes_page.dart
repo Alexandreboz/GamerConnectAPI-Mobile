@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../theme/design_system.dart';
 
 class SuccesPage extends StatelessWidget {
   final List<Map<String, String>> succes = [
@@ -33,32 +35,49 @@ class SuccesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Mes Succès"),
-        backgroundColor: Colors.black,
+        title: Text('ACHIEVEMENTS', style: AppStyles.heading.copyWith(fontSize: 18)),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
-      backgroundColor: const Color(0xFF0F0B1E),
       body: ListView.builder(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         itemCount: succes.length,
         itemBuilder: (context, index) {
           final item = succes[index];
-          return Card(
-            color: Colors.grey[900],
-            margin: const EdgeInsets.only(bottom: 12),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              leading: Icon(Icons.emoji_events, color: Colors.amber, size: 30),
-              title: Text(item['titre']!, style: TextStyle(color: Colors.white)),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(item['jeu']!, style: TextStyle(color: Colors.purpleAccent)),
-                  SizedBox(height: 4),
-                  Text(item['description']!, style: TextStyle(color: Colors.white70)),
-                ],
-              ),
+          return Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(16),
+            decoration: AppStyles.cardDecoration,
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.emoji_events_rounded, color: Colors.amber, size: 28),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item['jeu']!.toUpperCase(),
+                        style: TextStyle(color: AppColors.secondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(item['titre']!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      const SizedBox(height: 4),
+                      Text(item['description']!, style: AppStyles.subHeading.copyWith(fontSize: 13)),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          );
+          ).animate().fadeIn(delay: Duration(milliseconds: 100 * index)).slideY(begin: 0.2);
         },
       ),
     );

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../theme/design_system.dart';
 import 'actu_detail_page.dart';
 
 class ActuPage extends StatelessWidget {
@@ -16,7 +18,7 @@ class ActuPage extends StatelessWidget {
       'contenu': 'Les raids Téracristal ajoutent de nouveaux Pokémon événementiels.',
     },
     {
-      'titre': 'Monster Hunter - Extension Iceborne gratuite',
+      'titre': 'Monster Hunter - Iceborne Promo',
       'image': 'assets/images/monster.png',
       'jeu': 'Monster Hunter',
       'contenu': 'Capcom offre l\'extension Iceborne gratuitement pour une durée limitée.',
@@ -33,12 +35,13 @@ class ActuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Actus récentes'),
-        backgroundColor: Colors.black,
+        title: Text('GAMING NEWS', style: AppStyles.heading.copyWith(fontSize: 18)),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
-      backgroundColor: Color(0xFF0F0B1E),
       body: ListView.builder(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         itemCount: actus.length,
         itemBuilder: (context, index) {
           final actu = actus[index];
@@ -56,17 +59,39 @@ class ActuPage extends StatelessWidget {
                 ),
               );
             },
-            child: Card(
-              color: Colors.grey[900],
-              margin: EdgeInsets.only(bottom: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: ListTile(
-                leading: Image.asset(actu['image']!, width: 48, height: 48),
-                title: Text(actu['titre']!, style: TextStyle(color: Colors.white)),
-                subtitle: Text(actu['jeu']!, style: TextStyle(color: Colors.grey)),
-                trailing: Icon(Icons.chevron_right, color: Colors.white),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              padding: const EdgeInsets.all(12),
+              decoration: AppStyles.cardDecoration,
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(actu['image']!, width: 70, height: 70, fit: BoxFit.cover),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          actu['jeu']!.toUpperCase(),
+                          style: TextStyle(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          actu['titre']!,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 16),
+                ],
               ),
-            ),
+            ).animate().fadeIn(delay: Duration(milliseconds: 100 * index)).slideX(begin: 0.1),
           );
         },
       ),
