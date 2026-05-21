@@ -5,7 +5,7 @@ const getAllUsers = (callback) => {
 };
 
 const getUserBypseudo = (pseudo, callback) => {
-  db.query("SELECT * FROM Utilisateurs WHERE id_utilisateur = ?", [pseudo], callback);
+  db.query("SELECT * FROM Utilisateurs WHERE pseudo = ?", [pseudo], callback);
 };
 const getUserById = (id, callback) => {
   db.query("SELECT * FROM Utilisateurs WHERE id_utilisateur = ?", [id], callback);

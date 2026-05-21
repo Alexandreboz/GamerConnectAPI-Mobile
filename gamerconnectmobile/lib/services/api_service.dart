@@ -28,6 +28,16 @@ class ApiService {
     return res.statusCode == 201;
   }
 
+  static Future<bool> updateUser(
+      int userId, Map<String, dynamic> userData) async {
+    final res = await http.put(
+      Uri.parse('$_baseUrl/users/$userId'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(userData),
+    );
+    return res.statusCode == 200 || res.statusCode == 201;
+  }
+
   // ─── Groups ───────────────────────────────────────────────────────────────
   static Future<List<dynamic>> getGroupes() async {
     final res = await http.get(Uri.parse('$_baseUrl/groupes'));

@@ -9,7 +9,7 @@ exports.createUser = (req, res) => {
   }
 
   // Utilisation du modèle User
-  User.createUser({ nom, prenom,pseudo, email, mot_de_passe, plateformes_liees }, (err, result) => {
+  User.createUser({ nom, prenom, pseudo, email, mot_de_passe, plateformes_liees }, (err, result) => {
     if (err) {
       console.error("Erreur lors de la création de l'utilisateur :", err);
       return res.status(500).json({ error: "Erreur serveur lors de la création." });
@@ -44,10 +44,10 @@ exports.getUserBypseudo = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-  const { nom, prenom,  email, plateformes_liees } = req.body;
+  const { nom, prenom, pseudo, email, plateformes_liees } = req.body;
   db.query(
-    "UPDATE Utilisateurs SET nom = ?, prenom = ?, email = ?, plateformes_liees = ? WHERE id_utilisateur = ?",
-    [nom, prenom, email, plateformes_liees, req.params.id],
+    "UPDATE Utilisateurs SET nom = ?, prenom = ?, pseudo = ?, email = ?, plateformes_liees = ? WHERE id_utilisateur = ?",
+    [nom, prenom, pseudo, email, plateformes_liees, req.params.id],
     (err) => {
       if (err) return res.status(500).json({ error: "Erreur serveur" });
       res.json({ message: "Utilisateur mis à jour" });

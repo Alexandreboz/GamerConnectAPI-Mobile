@@ -7,6 +7,8 @@ import 'screens/register_page.dart';
 import 'screens/login.dart';
 import 'screens/home.dart';
 import 'screens/profil.dart';
+import 'screens/settings_page.dart';
+import 'screens/edit_profile_page.dart';
 import 'screens/evenement_page.dart';
 import 'screens/groupes_page.dart';
 import 'screens/joueurs_page.dart';
@@ -65,6 +67,8 @@ class GamerConnectApp extends StatelessWidget {
         '/evenements': (context) => EvenementPage(),
         '/groupes': (context) => GroupesPage(),
         '/joueurs': (context) => JoueursPage(),
+        '/settings': (context) => const SettingsPage(),
+        '/edit_profile': (context) => const EditProfilePage(),
         '/actu': (context) => ActuPage(),
         '/succes': (context) => SuccesPage(),
       },
