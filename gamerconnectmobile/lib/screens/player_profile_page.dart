@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/design_system.dart';
+import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class PlayerProfilePage extends StatefulWidget {
   final Map<String, dynamic> player;
@@ -492,55 +494,153 @@ class _PlayerProfilePageState extends State<PlayerProfilePage>
   }
 
   Widget _buildAchievementsTab() {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: _achievements.map((achievement) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(18),
-            decoration: AppStyles.cardDecoration,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: AppColors.cardGradient(
-                            achievement['color'] as Color),
+    final int? playerId = widget.player['id_utilisateur'] as int?;
+
+    return FutureBuilder<List<dynamic>>(
+      future: Future.wait([
+        ApiService.getBadges(),
+        playerId != null
+            ? ApiService.getUserBadges(playerId)
+            : Future.value([]),
+      ]),
+      builder: (context, snapshot) {
+        final hasData = snapshot.hasData && snapshot.data != null;
+        final badges = hasData ? snapshot.data![0] as List<dynamic> : [];
+        final userBadges = hasData ? snapshot.data![1] as List<dynamic> : [];
+
+        // Fallback sample community progress per game
+        final Map<String, double> communityProgress = {
+          for (var g in _favoriteGames) g['name'] as String: 0.4
+        };
+
+        // Map user badges by name for quick lookup
+        final Map<String, dynamic> userMap = {
+          for (var b in userBadges) (b['name'] ?? b['nom_badge'] ?? ''): b
+        };
+
+        final userTrophies = userBadges.isNotEmpty
+            ? userBadges
+            : _achievements
+                .map((a) => {
+                      'title': a['title'],
+                      'game': a['game'],
+                      'description': a['description'],
+                      'rarity': a['rarity'],
+                      'progress': (a['rarity'] == 'LEGENDARY' ? 1.0 : 0.6)
+                    })
+                .toList();
+
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppWidgets.sectionHeader('COMMUNITY TROPHIES'),
+              const SizedBox(height: 12),
+              ..._favoriteGames.map((g) {
+                final name = g['name'] as String;
+                final pct = communityProgress[name] ?? 0.0;
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 14),
+                  padding: const EdgeInsets.all(14),
+                  decoration: AppStyles.cardDecoration,
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(g['image'] as String,
+                            width: 60, height: 60, fit: BoxFit.cover),
                       ),
-                      child: const Icon(Icons.emoji_events_rounded,
-                          color: Colors.white, size: 20),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(achievement['title'] as String,
-                          style: AppStyles.heading.copyWith(fontSize: 16)),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(achievement['description'] as String,
-                    style: AppStyles.subHeading.copyWith(color: Colors.grey)),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    AppWidgets.badge(achievement['rarity'] as String,
-                        achievement['color'] as Color),
-                    const SizedBox(width: 8),
-                    Text(achievement['game'] as String,
-                        style: AppStyles.label.copyWith(color: Colors.grey)),
-                  ],
-                )
-              ],
-            ),
-          );
-        }).toList(),
-      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(name,
+                                style:
+                                    AppStyles.heading.copyWith(fontSize: 14)),
+                            const SizedBox(height: 6),
+                            Text(
+                                '${(pct * 100).toInt()}% collected by community',
+                                style: AppStyles.subHeading
+                                    .copyWith(color: Colors.grey)),
+                            const SizedBox(height: 8),
+                            AppWidgets.xpBar(pct),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Icon(Icons.emoji_events_rounded,
+                          color: AppColors.gold, size: 20),
+                    ],
+                  ),
+                );
+              }).toList(),
+              const SizedBox(height: 20),
+              AppWidgets.sectionHeader('PLAYER TROPHIES'),
+              const SizedBox(height: 12),
+              ...userTrophies.map((t) {
+                final title = t['title'] ?? t['nom_badge'] ?? '';
+                final game = t['game'] ?? t['jeu'] ?? '';
+                final desc = t['description'] ?? '';
+                final progress = (t['progress'] is num)
+                    ? (t['progress'] as num).toDouble()
+                    : (userMap[title] != null ? 1.0 : 0.0);
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: AppStyles.cardDecoration,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient:
+                                  AppColors.cardGradient(AppColors.primary),
+                            ),
+                            child: const Icon(Icons.emoji_events_rounded,
+                                color: Colors.white, size: 18),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(title,
+                                    style: AppStyles.heading
+                                        .copyWith(fontSize: 14)),
+                                const SizedBox(height: 4),
+                                Text(game,
+                                    style: AppStyles.label
+                                        .copyWith(color: Colors.grey)),
+                              ],
+                            ),
+                          ),
+                          Text('${(progress * 100).toInt()}%',
+                              style: AppStyles.label
+                                  .copyWith(color: AppColors.primary)),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(desc,
+                          style: AppStyles.subHeading
+                              .copyWith(color: Colors.grey)),
+                      const SizedBox(height: 8),
+                      AppWidgets.xpBar(progress.clamp(0.0, 1.0)),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
     );
   }
 }

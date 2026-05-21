@@ -11,6 +11,25 @@ class ActuPage extends StatefulWidget {
 
 class _ActuPageState extends State<ActuPage> {
   late Future<List<dynamic>> _actusFuture;
+  final List<Map<String, dynamic>> _sampleActus = [
+    {
+      'id_actu': -1,
+      'jeu': 'DEMO',
+      'titre': 'Bienvenue sur GamerConnect',
+      'contenu':
+          'Voici un exemple d’article en attendant que le serveur fournisse les actus.',
+      'image': 'assets/images/fifa.png',
+      'date_publication': '2026-05-21',
+    },
+    {
+      'id_actu': -2,
+      'jeu': 'DEMO',
+      'titre': 'Astuce du jour',
+      'contenu': 'Améliore ton game en pratiquant 15 minutes par jour.',
+      'image': 'assets/images/pokemon.png',
+      'date_publication': '2026-05-20',
+    },
+  ];
 
   @override
   void initState() {
@@ -48,16 +67,33 @@ class _ActuPageState extends State<ActuPage> {
                     style: AppStyles.subHeading));
           }
           final actus = snapshot.data ?? [];
-          if (actus.isEmpty) {
-            return Center(
-                child: Text('Aucune actualité disponible',
-                    style: AppStyles.subHeading));
-          }
+          final items = actus.isNotEmpty ? actus : _sampleActus;
+          final usingFallback = actus.isEmpty;
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            itemCount: actus.length,
+            itemCount: items.length + (usingFallback ? 1 : 0),
             itemBuilder: (context, index) {
-              final actu = actus[index] as Map<String, dynamic>;
+              if (usingFallback && index == 0) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Actualités suggérées',
+                          style: AppStyles.heading.copyWith(fontSize: 18)),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Affichage d’exemples en attendant le contenu du serveur.',
+                        style: AppStyles.body.copyWith(fontSize: 13),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                  ),
+                );
+              }
+
+              final idx = usingFallback ? index - 1 : index;
+              final actu = items[idx] as Map<String, dynamic>;
               final image = actu['image']?.toString() ?? '';
               return GestureDetector(
                 onTap: () {
@@ -81,7 +117,10 @@ class _ActuPageState extends State<ActuPage> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: _buildImage(image),
+                        child: Hero(
+                          tag: 'actu-${actu['titre']}',
+                          child: _buildImage(image),
+                        ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(

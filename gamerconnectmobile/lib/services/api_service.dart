@@ -143,4 +143,21 @@ class ApiService {
     if (res.statusCode == 200) return jsonDecode(res.body);
     return null;
   }
+
+  // ─── Badges / Trophées ──────────────────────────────────────────────────
+  static Future<List<dynamic>> getBadges() async {
+    try {
+      final res = await http.get(Uri.parse('$_baseUrl/badges'));
+      if (res.statusCode == 200) return jsonDecode(res.body);
+    } catch (_) {}
+    return [];
+  }
+
+  static Future<List<dynamic>> getUserBadges(int userId) async {
+    try {
+      final res = await http.get(Uri.parse('$_baseUrl/users/$userId/badges'));
+      if (res.statusCode == 200) return jsonDecode(res.body);
+    } catch (_) {}
+    return [];
+  }
 }
