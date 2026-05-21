@@ -15,6 +15,13 @@ class ActuDetailPage extends StatelessWidget {
     required this.image,
   });
 
+  Widget _buildHeaderImage() {
+    if (image.startsWith('http')) {
+      return Image.network(image, fit: BoxFit.cover);
+    }
+    return Image.asset(image, fit: BoxFit.cover);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,9 +33,10 @@ class ActuDetailPage extends StatelessWidget {
             flexibleSpace: FlexibleSpaceBar(
               background: Hero(
                 tag: 'actu-$titre',
-                child: Image.asset(image, fit: BoxFit.cover),
+                child: _buildHeaderImage(),
               ),
-              title: Text(jeu.toUpperCase(), style: AppStyles.heading.copyWith(fontSize: 14)),
+              title: Text(jeu.toUpperCase(),
+                  style: AppStyles.heading.copyWith(fontSize: 14)),
               centerTitle: true,
             ),
             backgroundColor: AppColors.background,
@@ -40,16 +48,21 @@ class ActuDetailPage extends StatelessWidget {
                 Text(
                   titre,
                   style: AppStyles.heading.copyWith(fontSize: 22),
-                ).animate().fadeIn(duration: const Duration(milliseconds: 600)).slideY(begin: 0.1),
+                )
+                    .animate()
+                    .fadeIn(duration: const Duration(milliseconds: 600))
+                    .slideY(begin: 0.1),
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: AppStyles.glassDecoration,
                   child: Row(
                     children: [
-                      const Icon(Icons.timer_outlined, color: AppColors.primary, size: 20),
+                      const Icon(Icons.timer_outlined,
+                          color: AppColors.primary, size: 20),
                       const SizedBox(width: 8),
-                      Text("Published 2 hours ago", style: AppStyles.subHeading),
+                      Text("Published 2 hours ago",
+                          style: AppStyles.subHeading),
                     ],
                   ),
                 ).animate().fadeIn(delay: const Duration(milliseconds: 200)),

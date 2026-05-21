@@ -90,4 +90,30 @@ class ApiService {
     if (res.statusCode == 200) return jsonDecode(res.body);
     return null;
   }
+
+  // ─── Actualités ─────────────────────────────────────────────────────────
+  static Future<List<dynamic>> getActus() async {
+    final res = await http.get(Uri.parse('$_baseUrl/actus'));
+    if (res.statusCode == 200) return jsonDecode(res.body);
+    return [];
+  }
+
+  static Future<Map<String, dynamic>?> getActuById(int id) async {
+    final res = await http.get(Uri.parse('$_baseUrl/actus/$id'));
+    if (res.statusCode == 200) return jsonDecode(res.body);
+    return null;
+  }
+
+  // ─── Succès ──────────────────────────────────────────────────────────────
+  static Future<List<dynamic>> getSucces() async {
+    final res = await http.get(Uri.parse('$_baseUrl/succes'));
+    if (res.statusCode == 200) return jsonDecode(res.body);
+    return [];
+  }
+
+  static Future<Map<String, dynamic>?> getSuccesById(int id) async {
+    final res = await http.get(Uri.parse('$_baseUrl/succes/$id'));
+    if (res.statusCode == 200) return jsonDecode(res.body);
+    return null;
+  }
 }

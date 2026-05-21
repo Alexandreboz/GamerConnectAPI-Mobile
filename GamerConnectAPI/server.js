@@ -10,6 +10,9 @@ app.use(express.json());
 
 app.use("/users", require("./routes/user.routes"));
 app.use("/groupes", require("./routes/groupe.routes"));
+app.use("/evenements", require("./routes/evenement.routes"));
+app.use("/actus", require("./routes/actus.routes"));
+app.use("/succes", require("./routes/succes.routes"));
 app.use("/messages", require("./routes/message.routes"));
 
 const db = require("./db");
