@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'api_host.dart';
 
-const String _baseUrl = 'http://localhost:3005';
+final String _baseUrl = apiBaseUrl;
 
 class ApiService {
+  static String get baseUrl => _baseUrl;
   // ─── Users ────────────────────────────────────────────────────────────────
   static Future<List<dynamic>> getUsers() async {
     final res = await http.get(Uri.parse('$_baseUrl/users'));
@@ -34,13 +36,15 @@ class ApiService {
   }
 
   static Future<List<dynamic>> getMembresGroupe(int groupeId) async {
-    final res = await http.get(Uri.parse('$_baseUrl/groupes/$groupeId/membres'));
+    final res =
+        await http.get(Uri.parse('$_baseUrl/groupes/$groupeId/membres'));
     if (res.statusCode == 200) return jsonDecode(res.body);
     return [];
   }
 
   static Future<List<dynamic>> getMessagesGroupe(int groupeId) async {
-    final res = await http.get(Uri.parse('$_baseUrl/groupes/$groupeId/messages'));
+    final res =
+        await http.get(Uri.parse('$_baseUrl/groupes/$groupeId/messages'));
     if (res.statusCode == 200) return jsonDecode(res.body);
     return [];
   }

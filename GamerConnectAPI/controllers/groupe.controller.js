@@ -31,7 +31,7 @@ exports.getMembresGroupe = (req, res) => {
   if (!id_groupe) return res.status(400).json({ error: "id_groupe requis" });
 
   const query = `
-    SELECT u.id_utilisateur, u.nom, u.prenom
+    SELECT u.id_utilisateur, u.nom, u.prenom, u.pseudo
     FROM Membres_Groupe mg
     JOIN Utilisateurs u ON u.id_utilisateur = mg.id_utilisateur
     WHERE mg.id_groupe = ?
@@ -56,7 +56,11 @@ exports.getMessagesDuGroupe = (req, res) => {
   const id_groupe = req.params.id;
 
   db.query(
-    "SELECT * FROM Messages_Groupes WHERE id_groupe = ?",
+    `SELECT mg.*, u.pseudo
+     FROM Messages_Groupes mg
+     JOIN Utilisateurs u ON u.id_utilisateur = mg.id_utilisateur
+     WHERE mg.id_groupe = ?
+     ORDER BY mg.id_message ASC`,
     [id_groupe],
     (err, result) => {
       if (err) return res.status(500).json({ error: "Erreur SQL" });

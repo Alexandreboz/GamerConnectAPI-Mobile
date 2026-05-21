@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 import '../theme/design_system.dart';
 import '../services/auth_service.dart';
@@ -57,7 +55,7 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
   }
 
   void _connectSocket() {
-    socket = io.io('http://localhost:3005', <String, dynamic>{
+    socket = io.io(ApiService.baseUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
     });
@@ -92,7 +90,8 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
       final msg = await ApiService.sendMessage(_userId!, widget.idGroupe, text);
       if (msg != null && mounted) {
         // Server emit via WebSocket will add to list; but add locally as fallback
-        final already = messages.any((m) => m['id_message'] == msg['id_message']);
+        final already =
+            messages.any((m) => m['id_message'] == msg['id_message']);
         if (!already) setState(() => messages.add(msg));
         _scrollBottom();
       }
@@ -116,9 +115,11 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
         leading: const BackButton(color: Colors.white),
         title: Column(
           children: [
-            Text(widget.nomGroupe ?? "DISCUSSION", style: AppStyles.heading.copyWith(fontSize: 16)),
+            Text(widget.nomGroupe ?? "DISCUSSION",
+                style: AppStyles.heading.copyWith(fontSize: 16)),
             Text("${membres.length} membre${membres.length != 1 ? 's' : ''}",
-                style: AppStyles.subHeading.copyWith(fontSize: 10, color: AppColors.secondary)),
+                style: AppStyles.subHeading
+                    .copyWith(fontSize: 10, color: AppColors.secondary)),
           ],
         ),
         actions: [
@@ -129,7 +130,8 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary))
           : Column(
               children: [
                 const Divider(height: 1, color: AppColors.glassWhite),
@@ -139,7 +141,8 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
                       ? _emptyState()
                       : ListView.builder(
                           controller: _scrollCtrl,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 16),
                           itemCount: messages.length,
                           itemBuilder: (_, i) => _bubble(messages[i]),
                         ),
@@ -159,7 +162,7 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
         itemCount: membres.length,
         itemBuilder: (_, i) {
           final m = membres[i];
-          final name = m['pseudo'] ?? m['prenom'] ?? '?';
+          final name = m['pseudo'] ?? m['prenom'] ?? m['nom'] ?? '?';
           return Padding(
             padding: const EdgeInsets.only(right: 12),
             child: Tooltip(
@@ -169,9 +172,16 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
                   CircleAvatar(
                     radius: 18,
                     backgroundColor: AppColors.primary.withOpacity(0.2),
-                    child: Text(name[0].toUpperCase(), style: const TextStyle(color: AppColors.primary, fontSize: 13, fontWeight: FontWeight.bold)),
+                    child: Text(name[0].toUpperCase(),
+                        style: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold)),
                   ),
-                  Positioned(right: 0, bottom: 0, child: AppWidgets.onlineDot(online: i % 3 != 0)),
+                  Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: AppWidgets.onlineDot(online: i % 3 != 0)),
                 ],
               ),
             ),
@@ -186,11 +196,13 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.chat_bubble_outline_rounded, color: Colors.grey, size: 60),
+          const Icon(Icons.chat_bubble_outline_rounded,
+              color: Colors.grey, size: 60),
           const SizedBox(height: 16),
           Text("Sois le premier à écrire !", style: AppStyles.subHeading),
           const SizedBox(height: 8),
-          Text("Lance la conversation 🎮", style: AppStyles.body.copyWith(fontSize: 13)),
+          Text("Lance la conversation 🎮",
+              style: AppStyles.body.copyWith(fontSize: 13)),
         ],
       ),
     );
@@ -198,20 +210,27 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
 
   Widget _bubble(dynamic msg) {
     final isMe = msg['id_utilisateur'] == _userId;
-    final name = msg['pseudo'] ?? 'User';
+    final name = msg['pseudo'] ?? msg['prenom'] ?? msg['nom'] ?? 'User';
     final content = msg['contenu'] ?? '';
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
         child: Column(
-          crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment:
+              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            if (!isMe) Padding(
-              padding: const EdgeInsets.only(left: 12, bottom: 4),
-              child: Text(name, style: const TextStyle(color: AppColors.secondary, fontSize: 11, fontWeight: FontWeight.bold)),
-            ),
+            if (!isMe)
+              Padding(
+                padding: const EdgeInsets.only(left: 12, bottom: 4),
+                child: Text(name,
+                    style: const TextStyle(
+                        color: AppColors.secondary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold)),
+              ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
@@ -223,19 +242,30 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
                   bottomLeft: Radius.circular(isMe ? 18 : 2),
                   bottomRight: Radius.circular(isMe ? 2 : 18),
                 ),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 6, offset: const Offset(0, 2))],
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2))
+                ],
               ),
-              child: Text(content, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.4)),
+              child: Text(content,
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 14, height: 1.4)),
             ),
           ],
         ),
-      ).animate().fadeIn(duration: const Duration(milliseconds: 200)).slideY(begin: 0.1),
+      )
+          .animate()
+          .fadeIn(duration: const Duration(milliseconds: 200))
+          .slideY(begin: 0.1),
     );
   }
 
   Widget _inputBar() {
     return Container(
-      padding: EdgeInsets.fromLTRB(16, 10, 16, 16 + MediaQuery.of(context).padding.bottom),
+      padding: EdgeInsets.fromLTRB(
+          16, 10, 16, 16 + MediaQuery.of(context).padding.bottom),
       decoration: BoxDecoration(
         color: AppColors.surface,
         border: Border(top: BorderSide(color: Colors.white.withOpacity(0.06))),
@@ -258,9 +288,11 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
                   hintText: "Écris un message...",
                   hintStyle: AppStyles.subHeading,
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   suffixIcon: IconButton(
-                    icon: const Icon(Icons.emoji_emotions_outlined, color: Colors.grey, size: 20),
+                    icon: const Icon(Icons.emoji_emotions_outlined,
+                        color: Colors.grey, size: 20),
                     onPressed: () {},
                   ),
                 ),
@@ -277,11 +309,22 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
                 gradient: _sending ? null : AppColors.primaryGradient,
                 color: _sending ? Colors.grey.withOpacity(0.3) : null,
                 shape: BoxShape.circle,
-                boxShadow: _sending ? null : [BoxShadow(color: AppColors.primary.withOpacity(0.4), blurRadius: 10)],
+                boxShadow: _sending
+                    ? null
+                    : [
+                        BoxShadow(
+                            color: AppColors.primary.withOpacity(0.4),
+                            blurRadius: 10)
+                      ],
               ),
               child: _sending
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
+                  : const Icon(Icons.send_rounded,
+                      color: Colors.white, size: 20),
             ),
           ),
         ],
@@ -293,14 +336,16 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) => Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Membres (${membres.length})", style: AppStyles.heading.copyWith(fontSize: 16)),
+            Text("Membres (${membres.length})",
+                style: AppStyles.heading.copyWith(fontSize: 16)),
             const SizedBox(height: 16),
             ...membres.map((m) {
               final name = m['pseudo'] ?? '${m['prenom']} ${m['nom']}';
@@ -308,7 +353,8 @@ class _DiscussionGroupePageState extends State<DiscussionGroupePage> {
                 contentPadding: EdgeInsets.zero,
                 leading: CircleAvatar(
                   backgroundColor: AppColors.primary.withOpacity(0.15),
-                  child: Text(name[0].toUpperCase(), style: const TextStyle(color: AppColors.primary)),
+                  child: Text(name[0].toUpperCase(),
+                      style: const TextStyle(color: AppColors.primary)),
                 ),
                 title: Text(name, style: const TextStyle(color: Colors.white)),
                 trailing: AppWidgets.onlineDot(),

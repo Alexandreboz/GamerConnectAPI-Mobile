@@ -50,16 +50,26 @@ app.post("/messages", (req, res) => {
   db.query(sql, [contenu, id_utilisateur, id_groupe], (err, result) => {
     if (err) return res.status(500).json({ error: "Erreur SQL" });
 
-    const message = {
-      id_message: result.insertId,
-      id_utilisateur,
-      id_groupe,
-      contenu,
-      date_envoi: new Date(),
-    };
+    db.query(
+      "SELECT pseudo FROM Utilisateurs WHERE id_utilisateur = ?",
+      [id_utilisateur],
+      (err2, rows) => {
+        if (err2) return res.status(500).json({ error: "Erreur SQL" });
 
-    io.to(`groupe_${id_groupe}`).emit("newMessage", message);
-    res.status(201).json(message);
+        const pseudo = rows[0]?.pseudo || null;
+        const message = {
+          id_message: result.insertId,
+          id_utilisateur,
+          id_groupe,
+          contenu,
+          pseudo,
+          date_envoi: new Date(),
+        };
+
+        io.to(`groupe_${id_groupe}`).emit("newMessage", message);
+        res.status(201).json(message);
+      }
+    );
   });
 });
 
