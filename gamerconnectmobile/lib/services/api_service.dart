@@ -91,6 +91,23 @@ class ApiService {
     return null;
   }
 
+  static Future<bool> participerEvenement(int eventId, int userId,
+      {bool join = true}) async {
+    final res = await http.post(
+      Uri.parse('$_baseUrl/evenements/$eventId/participer'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(
+          {'id_utilisateur': userId, 'action': join ? 'join' : 'leave'}),
+    );
+    return res.statusCode == 200 || res.statusCode == 201;
+  }
+
+  static Future<List<dynamic>> getEvenementsInscrits(int userId) async {
+    final res = await http.get(Uri.parse('$_baseUrl/evenements/user/$userId'));
+    if (res.statusCode == 200) return jsonDecode(res.body);
+    return [];
+  }
+
   // ─── Actualités ─────────────────────────────────────────────────────────
   static Future<List<dynamic>> getActus() async {
     final res = await http.get(Uri.parse('$_baseUrl/actus'));

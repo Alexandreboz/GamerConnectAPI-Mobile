@@ -63,7 +63,8 @@ CREATE TABLE Participants (
     id_utilisateur INT NOT NULL,
     statut ENUM('Confirmé', 'En attente', 'Refusé') DEFAULT 'En attente',
     FOREIGN KEY (id_evenement) REFERENCES Evenements(id_evenement) ON DELETE CASCADE,
-    FOREIGN KEY (id_utilisateur) REFERENCES Utilisateurs(id_utilisateur) ON DELETE CASCADE
+    FOREIGN KEY (id_utilisateur) REFERENCES Utilisateurs(id_utilisateur) ON DELETE CASCADE,
+    UNIQUE KEY uniq_evenement_utilisateur (id_evenement, id_utilisateur)
 );
 
 CREATE TABLE Ressources_Educatives (
