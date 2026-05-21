@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/design_system.dart';
+import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import 'profil.dart';
+import 'player_profile_page.dart';
 import 'evenement_page.dart';
-import 'joueurs_page.dart';
 import 'actu_page.dart';
 import 'succes_page.dart';
 import 'groupes_page.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage>
@@ -21,6 +25,10 @@ class _HomePageState extends State<HomePage>
   bool _searchActive = false;
   String _username = 'Gamer';
   late AnimationController _onlineController;
+  final TextEditingController _searchController = TextEditingController();
+  List<dynamic> _allPlayers = [];
+  List<dynamic> _filteredPlayers = [];
+  int? _currentUserId;
 
   final List<Map<String, dynamic>> _feedItems = [
     {
@@ -68,7 +76,44 @@ class _HomePageState extends State<HomePage>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+    _searchController.addListener(_onSearchChanged);
+    _loadPlayers();
     _loadUser();
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      _searchQuery = _searchController.text.trim();
+      _applySearch();
+    });
+  }
+
+  void _applySearch() {
+    final query = _searchQuery.toLowerCase();
+    _filteredPlayers = query.isEmpty
+        ? _allPlayers
+        : _allPlayers.where((u) {
+            final pseudo = (u['pseudo'] ?? '').toString().toLowerCase();
+            return pseudo.contains(query);
+          }).toList();
+  }
+
+  Future<void> _loadPlayers() async {
+    _currentUserId = await AuthService.getUserId();
+    try {
+      final users = await ApiService.getUsers();
+      if (!mounted) return;
+      setState(() {
+        _allPlayers =
+            users.where((u) => u['id_utilisateur'] != _currentUserId).toList();
+        _applySearch();
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _allPlayers = [];
+      });
+    }
   }
 
   Future<void> _loadUser() async {
@@ -83,6 +128,7 @@ class _HomePageState extends State<HomePage>
   @override
   void dispose() {
     _onlineController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -179,7 +225,13 @@ class _HomePageState extends State<HomePage>
           IconButton(
             icon: Icon(_searchActive ? Icons.close : Icons.search_rounded,
                 color: Colors.white),
-            onPressed: () => setState(() => _searchActive = !_searchActive),
+            onPressed: () => setState(() {
+              if (_searchActive) {
+                _searchController.clear();
+                _searchQuery = '';
+              }
+              _searchActive = !_searchActive;
+            }),
           ),
           GestureDetector(
             onTap: () => Navigator.push(
@@ -211,25 +263,109 @@ class _HomePageState extends State<HomePage>
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-      child: Container(
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.glassBorder),
+            ),
+            child: TextField(
+              controller: _searchController,
+              autofocus: true,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Recherche par pseudo...',
+                hintStyle: const TextStyle(color: Colors.grey),
+                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: Colors.grey),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      )
+                    : null,
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ),
+          if (_searchQuery.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            _buildSearchSuggestions(),
+          ],
+        ],
+      ).animate().fadeIn().slideY(begin: -0.2),
+    );
+  }
+
+  Widget _buildSearchSuggestions() {
+    if (_filteredPlayers.isEmpty) {
+      return Container(
+        width: double.infinity,
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.glassBorder),
         ),
-        child: TextField(
-          autofocus: true,
-          onChanged: (v) => setState(() => _searchQuery = v),
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'Search players, games, groups...',
-            hintStyle: TextStyle(color: Colors.grey),
-            prefixIcon: Icon(Icons.search, color: AppColors.primary),
-            border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(vertical: 14),
+        padding: const EdgeInsets.all(16),
+        child: Text('Aucun joueur trouvé', style: AppStyles.subHeading),
+      );
+    }
+
+    final suggestions = _filteredPlayers.take(5).toList();
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 320),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.glassBorder),
+        ),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: suggestions.asMap().entries.map((entry) {
+              final index = entry.key;
+              final player = entry.value;
+              final pseudo = player['pseudo'] ?? 'Joueur';
+              final prenom = player['prenom'] ?? '';
+              final nom = player['nom'] ?? '';
+              return Column(
+                children: [
+                  if (index > 0)
+                    Divider(color: Colors.white.withOpacity(0.08), height: 1),
+                  ListTile(
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    title: Text(pseudo,
+                        style: const TextStyle(color: Colors.white)),
+                    subtitle: Text(
+                      [prenom, nom]
+                          .where((s) => s?.isNotEmpty ?? false)
+                          .join(' '),
+                      style: AppStyles.subHeading.copyWith(fontSize: 12),
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios_rounded,
+                        color: Colors.grey, size: 16),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PlayerProfilePage(player: player),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }).toList(),
           ),
         ),
-      ).animate().fadeIn().slideY(begin: -0.2),
+      ),
     );
   }
 
@@ -366,12 +502,6 @@ class _HomePageState extends State<HomePage>
         'color': AppColors.orange,
         'page': GroupesPage()
       },
-      {
-        'label': 'PLAYERS',
-        'icon': Icons.person_search_rounded,
-        'color': AppColors.accent,
-        'page': JoueursPage()
-      },
     ];
     return GridView.count(
       shrinkWrap: true,
@@ -423,12 +553,15 @@ class _HomePageState extends State<HomePage>
   Widget _buildFeed() {
     final filtered = _searchQuery.isEmpty
         ? _feedItems
-        : _feedItems
-            .where((f) => f['content']
-                .toString()
-                .toLowerCase()
-                .contains(_searchQuery.toLowerCase()))
-            .toList();
+        : _feedItems.where((f) {
+            final query = _searchQuery.toLowerCase();
+            final content = f['content']?.toString().toLowerCase() ?? '';
+            final user = f['user']?.toString().toLowerCase() ?? '';
+            final tags = (f['tags'] as List<dynamic>).join(' ').toLowerCase();
+            return content.contains(query) ||
+                user.contains(query) ||
+                tags.contains(query);
+          }).toList();
 
     if (filtered.isEmpty) {
       return Center(
@@ -436,7 +569,8 @@ class _HomePageState extends State<HomePage>
           padding: const EdgeInsets.all(40),
           child: Column(
             children: [
-              Icon(Icons.search_off_rounded, color: Colors.grey, size: 50),
+              const Icon(Icons.search_off_rounded,
+                  color: Colors.grey, size: 50),
               const SizedBox(height: 12),
               Text("No results found", style: AppStyles.subHeading),
             ],
@@ -598,16 +732,21 @@ class _HomePageState extends State<HomePage>
     final isActive = _selectedIndex == index;
     return GestureDetector(
       onTap: () {
-        setState(() => _selectedIndex = index);
-        if (index == 1)
+        setState(() {
+          _selectedIndex = index;
+        });
+        if (index == 1) {
           Navigator.push(
               context, MaterialPageRoute(builder: (_) => GroupesPage()));
-        if (index == 2)
+        }
+        if (index == 2) {
           Navigator.push(
               context, MaterialPageRoute(builder: (_) => EvenementPage()));
-        if (index == 3)
+        }
+        if (index == 3) {
           Navigator.push(
               context, MaterialPageRoute(builder: (_) => ProfilPage()));
+        }
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -678,7 +817,7 @@ class _HomePageState extends State<HomePage>
           const SizedBox(height: 16),
           Row(
             children: [
-              Icon(Icons.tag_rounded, color: AppColors.primary, size: 20),
+              const Icon(Icons.tag_rounded, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
               Text("Add tags to reach the right players",
                   style: AppStyles.subHeading),
