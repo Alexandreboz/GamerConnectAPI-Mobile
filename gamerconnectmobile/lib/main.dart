@@ -9,6 +9,7 @@ import 'screens/home.dart';
 import 'screens/profil.dart';
 import 'screens/evenement_page.dart';
 import 'screens/groupes_page.dart';
+import 'screens/joueurs_page.dart';
 import 'screens/actu_page.dart';
 import 'screens/succes_page.dart';
 
@@ -38,7 +39,8 @@ class GamerConnectApp extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           ),
         ),
@@ -49,7 +51,8 @@ class GamerConnectApp extends StatelessWidget {
         ),
         snackBarTheme: SnackBarThemeData(
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
       home: const _SplashRouter(),
@@ -61,6 +64,7 @@ class GamerConnectApp extends StatelessWidget {
         '/profil': (context) => ProfilPage(),
         '/evenements': (context) => EvenementPage(),
         '/groupes': (context) => GroupesPage(),
+        '/joueurs': (context) => JoueursPage(),
         '/actu': (context) => ActuPage(),
         '/succes': (context) => SuccesPage(),
       },
@@ -106,9 +110,13 @@ class _SplashRouterState extends State<_SplashRouter> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: AppColors.primaryGradient,
-                boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.5), blurRadius: 30)],
+                boxShadow: [
+                  BoxShadow(
+                      color: AppColors.primary.withOpacity(0.5), blurRadius: 30)
+                ],
               ),
-              child: const Icon(Icons.sports_esports_rounded, color: Colors.white, size: 50),
+              child: const Icon(Icons.sports_esports_rounded,
+                  color: Colors.white, size: 50),
             ),
             const SizedBox(height: 24),
             Text(
@@ -116,7 +124,8 @@ class _SplashRouterState extends State<_SplashRouter> {
               style: AppStyles.heading.copyWith(fontSize: 22, letterSpacing: 3),
             ),
             const SizedBox(height: 48),
-            const CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2),
+            const CircularProgressIndicator(
+                color: AppColors.primary, strokeWidth: 2),
           ],
         ),
       ),

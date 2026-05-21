@@ -4,17 +4,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/design_system.dart';
 import 'profil.dart';
 import 'evenement_page.dart';
+import 'joueurs_page.dart';
 import 'actu_page.dart';
 import 'succes_page.dart';
 import 'groupes_page.dart';
-import 'welcome.dart';
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   String _searchQuery = '';
   bool _searchActive = false;
@@ -27,7 +28,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       'avatar': 'Z',
       'avatarColor': AppColors.primary,
       'time': '2m ago',
-      'content': 'Just hit Diamond rank on Valorant 🎮🔥 Who wants to squad up?',
+      'content':
+          'Just hit Diamond rank on Valorant 🎮🔥 Who wants to squad up?',
       'tags': ['#Valorant', '#Diamond'],
       'likes': 142,
       'comments': 38,
@@ -38,7 +40,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       'avatar': 'G',
       'avatarColor': AppColors.accent,
       'time': '15m ago',
-      'content': 'Tournament starts in 3 hours. No mercy today. Training mode ON. 💪',
+      'content':
+          'Tournament starts in 3 hours. No mercy today. Training mode ON. 💪',
       'tags': ['#Tournament', '#FGC'],
       'likes': 87,
       'comments': 21,
@@ -49,7 +52,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       'avatar': 'N',
       'avatarColor': AppColors.secondary,
       'time': '1h ago',
-      'content': 'New Monster Hunter DLC drops tomorrow! Been waiting for this for months 🐉',
+      'content':
+          'New Monster Hunter DLC drops tomorrow! Been waiting for this for months 🐉',
       'tags': ['#MonsterHunter', '#Gaming'],
       'likes': 312,
       'comments': 74,
@@ -98,7 +102,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   await Future.delayed(const Duration(seconds: 1));
                 },
                 child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                  physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics()),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
@@ -113,7 +118,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         const SizedBox(height: 16),
                         _buildBentoMenu(),
                         const SizedBox(height: 28),
-                        AppWidgets.sectionHeader("COMMUNITY FEED", onSeeAll: () {}),
+                        AppWidgets.sectionHeader("COMMUNITY FEED",
+                            onSeeAll: () {}),
                         const SizedBox(height: 16),
                         _buildFeed(),
                         const SizedBox(height: 80),
@@ -144,7 +150,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               gradient: AppColors.primaryGradient,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.sports_esports_rounded, color: Colors.white, size: 22),
+            child: const Icon(Icons.sports_esports_rounded,
+                color: Colors.white, size: 22),
           ),
           const SizedBox(width: 10),
           Text("GamerConnect", style: AppStyles.heading.copyWith(fontSize: 18)),
@@ -160,7 +167,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.green.withOpacity(0.3 + _onlineController.value * 0.4),
+                    color: AppColors.green
+                        .withOpacity(0.3 + _onlineController.value * 0.4),
                     blurRadius: 8 + _onlineController.value * 6,
                   ),
                 ],
@@ -169,11 +177,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
           const SizedBox(width: 12),
           IconButton(
-            icon: Icon(_searchActive ? Icons.close : Icons.search_rounded, color: Colors.white),
+            icon: Icon(_searchActive ? Icons.close : Icons.search_rounded,
+                color: Colors.white),
             onPressed: () => setState(() => _searchActive = !_searchActive),
           ),
           GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProfilPage())),
+            onTap: () => Navigator.push(
+                context, MaterialPageRoute(builder: (_) => ProfilPage())),
             child: Container(
               width: 36,
               height: 36,
@@ -185,7 +195,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               child: Center(
                 child: Text(
                   _username.isNotEmpty ? _username[0].toUpperCase() : 'G',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14),
                 ),
               ),
             ),
@@ -222,7 +235,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   Widget _buildWelcomeCard() {
     final hour = DateTime.now().hour;
-    final greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+    final greeting = hour < 12
+        ? 'Good Morning'
+        : hour < 18
+            ? 'Good Afternoon'
+            : 'Good Evening';
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -240,9 +257,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(greeting, style: AppStyles.subHeading.copyWith(color: AppColors.primaryLight)),
+                Text(greeting,
+                    style: AppStyles.subHeading
+                        .copyWith(color: AppColors.primaryLight)),
                 const SizedBox(height: 4),
-                Text("Welcome back, $_username!", style: AppStyles.heading.copyWith(fontSize: 18)),
+                Text("Welcome back, $_username!",
+                    style: AppStyles.heading.copyWith(fontSize: 18)),
                 const SizedBox(height: 12),
                 AppWidgets.badge("LEVEL 28 • DIAMOND", AppColors.secondary),
               ],
@@ -255,18 +275,37 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               color: AppColors.primary.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.emoji_events_rounded, color: AppColors.gold, size: 36),
+            child: const Icon(Icons.emoji_events_rounded,
+                color: AppColors.gold, size: 36),
           ),
         ],
       ),
-    ).animate().fadeIn(delay: const Duration(milliseconds: 100)).slideY(begin: 0.1);
+    )
+        .animate()
+        .fadeIn(delay: const Duration(milliseconds: 100))
+        .slideY(begin: 0.1);
   }
 
   Widget _buildStatsRow() {
     final stats = [
-      {'label': 'WINS', 'value': '347', 'color': AppColors.green, 'icon': Icons.military_tech_rounded},
-      {'label': 'RANK', 'value': '#142', 'color': AppColors.gold, 'icon': Icons.leaderboard_rounded},
-      {'label': 'HOURS', 'value': '1.2K', 'color': AppColors.secondary, 'icon': Icons.timer_rounded},
+      {
+        'label': 'WINS',
+        'value': '347',
+        'color': AppColors.green,
+        'icon': Icons.military_tech_rounded
+      },
+      {
+        'label': 'RANK',
+        'value': '#142',
+        'color': AppColors.gold,
+        'icon': Icons.leaderboard_rounded
+      },
+      {
+        'label': 'HOURS',
+        'value': '1.2K',
+        'color': AppColors.secondary,
+        'icon': Icons.timer_rounded
+      },
     ];
     return Row(
       children: stats.asMap().entries.map((e) {
@@ -274,19 +313,28 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         final s = e.value;
         return Expanded(
           child: Container(
-            margin: EdgeInsets.only(left: i == 0 ? 0 : 8, right: i == 2 ? 0 : 8),
+            margin:
+                EdgeInsets.only(left: i == 0 ? 0 : 8, right: i == 2 ? 0 : 8),
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
             decoration: AppStyles.glowDecoration(s['color'] as Color),
             child: Column(
               children: [
-                Icon(s['icon'] as IconData, color: s['color'] as Color, size: 22),
+                Icon(s['icon'] as IconData,
+                    color: s['color'] as Color, size: 22),
                 const SizedBox(height: 8),
-                Text(s['value'] as String, style: AppStyles.heading.copyWith(fontSize: 18, color: Colors.white)),
+                Text(s['value'] as String,
+                    style: AppStyles.heading
+                        .copyWith(fontSize: 18, color: Colors.white)),
                 const SizedBox(height: 2),
-                Text(s['label'] as String, style: AppStyles.label.copyWith(color: Colors.grey, fontSize: 9)),
+                Text(s['label'] as String,
+                    style: AppStyles.label
+                        .copyWith(color: Colors.grey, fontSize: 9)),
               ],
             ),
-          ).animate().fadeIn(delay: Duration(milliseconds: 150 + i * 80)).slideY(begin: 0.2),
+          )
+              .animate()
+              .fadeIn(delay: Duration(milliseconds: 150 + i * 80))
+              .slideY(begin: 0.2),
         );
       }).toList(),
     );
@@ -294,10 +342,36 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   Widget _buildBentoMenu() {
     final items = [
-      {'label': 'NEWS', 'icon': Icons.newspaper_rounded, 'color': AppColors.primary, 'page': ActuPage()},
-      {'label': 'EVENTS', 'icon': Icons.event_available_rounded, 'color': AppColors.secondary, 'page': EvenementPage()},
-      {'label': 'TROPHIES', 'icon': Icons.emoji_events_rounded, 'color': AppColors.gold, 'page': SuccesPage()},
-      {'label': 'GROUPS', 'icon': Icons.groups_rounded, 'color': AppColors.orange, 'page': GroupesPage()},
+      {
+        'label': 'NEWS',
+        'icon': Icons.newspaper_rounded,
+        'color': AppColors.primary,
+        'page': ActuPage()
+      },
+      {
+        'label': 'EVENTS',
+        'icon': Icons.event_available_rounded,
+        'color': AppColors.secondary,
+        'page': EvenementPage()
+      },
+      {
+        'label': 'TROPHIES',
+        'icon': Icons.emoji_events_rounded,
+        'color': AppColors.gold,
+        'page': SuccesPage()
+      },
+      {
+        'label': 'GROUPS',
+        'icon': Icons.groups_rounded,
+        'color': AppColors.orange,
+        'page': GroupesPage()
+      },
+      {
+        'label': 'PLAYERS',
+        'icon': Icons.person_search_rounded,
+        'color': AppColors.accent,
+        'page': JoueursPage()
+      },
     ];
     return GridView.count(
       shrinkWrap: true,
@@ -311,7 +385,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         final item = e.value;
         final color = item['color'] as Color;
         return GestureDetector(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => item['page'] as Widget)),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (_) => item['page'] as Widget)),
           child: Container(
             decoration: BoxDecoration(
               gradient: AppColors.cardGradient(color),
@@ -336,7 +411,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ),
               ],
             ),
-          ).animate().fadeIn(delay: Duration(milliseconds: 200 + i * 60)).scale(begin: const Offset(0.9, 0.9)),
+          )
+              .animate()
+              .fadeIn(delay: Duration(milliseconds: 200 + i * 60))
+              .scale(begin: const Offset(0.9, 0.9)),
         );
       }).toList(),
     );
@@ -345,7 +423,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget _buildFeed() {
     final filtered = _searchQuery.isEmpty
         ? _feedItems
-        : _feedItems.where((f) => f['content'].toString().toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+        : _feedItems
+            .where((f) => f['content']
+                .toString()
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase()))
+            .toList();
 
     if (filtered.isEmpty) {
       return Center(
@@ -386,7 +469,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 decoration: BoxDecoration(
                   color: (item['avatarColor'] as Color).withOpacity(0.2),
                   shape: BoxShape.circle,
-                  border: Border.all(color: item['avatarColor'] as Color, width: 2),
+                  border:
+                      Border.all(color: item['avatarColor'] as Color, width: 2),
                 ),
                 child: Center(
                   child: Text(
@@ -404,12 +488,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item['user'] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text(item['user'] as String,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15)),
                     Row(
                       children: [
                         AppWidgets.onlineDot(online: index != 2),
                         const SizedBox(width: 5),
-                        Text(item['time'] as String, style: AppStyles.subHeading.copyWith(fontSize: 11)),
+                        Text(item['time'] as String,
+                            style: AppStyles.subHeading.copyWith(fontSize: 11)),
                       ],
                     ),
                   ],
@@ -423,9 +512,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
-            children: (item['tags'] as List<String>).map((tag) =>
-              AppWidgets.badge(tag, AppColors.primary)
-            ).toList(),
+            children: (item['tags'] as List<String>)
+                .map((tag) => AppWidgets.badge(tag, AppColors.primary))
+                .toList(),
           ),
           const SizedBox(height: 16),
           Divider(color: Colors.white.withOpacity(0.06), height: 1),
@@ -436,38 +525,52 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 onTap: () {
                   setState(() {
                     item['liked'] = !(item['liked'] as bool);
-                    item['likes'] = item['liked'] ? (item['likes'] as int) + 1 : (item['likes'] as int) - 1;
+                    item['likes'] = item['liked']
+                        ? (item['likes'] as int) + 1
+                        : (item['likes'] as int) - 1;
                   });
                 },
                 child: Row(
                   children: [
                     Icon(
-                      item['liked'] ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                      item['liked']
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
                       color: item['liked'] ? AppColors.accent : Colors.grey,
                       size: 20,
                     ),
                     const SizedBox(width: 6),
-                    Text(item['likes'].toString(), style: TextStyle(color: item['liked'] ? AppColors.accent : Colors.grey, fontSize: 13)),
+                    Text(item['likes'].toString(),
+                        style: TextStyle(
+                            color:
+                                item['liked'] ? AppColors.accent : Colors.grey,
+                            fontSize: 13)),
                   ],
                 ),
               ),
               const SizedBox(width: 24),
               Row(
                 children: [
-                  const Icon(Icons.chat_bubble_outline_rounded, color: Colors.grey, size: 20),
+                  const Icon(Icons.chat_bubble_outline_rounded,
+                      color: Colors.grey, size: 20),
                   const SizedBox(width: 6),
-                  Text(item['comments'].toString(), style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                  Text(item['comments'].toString(),
+                      style: const TextStyle(color: Colors.grey, fontSize: 13)),
                 ],
               ),
               const Spacer(),
               const Icon(Icons.share_outlined, color: Colors.grey, size: 20),
               const SizedBox(width: 16),
-              const Icon(Icons.bookmark_border_rounded, color: Colors.grey, size: 20),
+              const Icon(Icons.bookmark_border_rounded,
+                  color: Colors.grey, size: 20),
             ],
           ),
         ],
       ),
-    ).animate().fadeIn(delay: Duration(milliseconds: 100 * index)).slideY(begin: 0.1);
+    )
+        .animate()
+        .fadeIn(delay: Duration(milliseconds: 100 * index))
+        .slideY(begin: 0.1);
   }
 
   Widget _buildBottomNav() {
@@ -496,18 +599,27 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return GestureDetector(
       onTap: () {
         setState(() => _selectedIndex = index);
-        if (index == 1) Navigator.push(context, MaterialPageRoute(builder: (_) => GroupesPage()));
-        if (index == 2) Navigator.push(context, MaterialPageRoute(builder: (_) => EvenementPage()));
-        if (index == 3) Navigator.push(context, MaterialPageRoute(builder: (_) => ProfilPage()));
+        if (index == 1)
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => GroupesPage()));
+        if (index == 2)
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => EvenementPage()));
+        if (index == 3)
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => ProfilPage()));
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
+          color: isActive
+              ? AppColors.primary.withOpacity(0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: isActive ? AppColors.primary : Colors.grey, size: 26),
+        child: Icon(icon,
+            color: isActive ? AppColors.primary : Colors.grey, size: 26),
       ),
     );
   }
@@ -539,9 +651,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         children: [
           Row(
             children: [
-              Text("QUICK POST", style: AppStyles.heading.copyWith(fontSize: 16)),
+              Text("QUICK POST",
+                  style: AppStyles.heading.copyWith(fontSize: 16)),
               const Spacer(),
-              IconButton(icon: const Icon(Icons.close, color: Colors.grey), onPressed: () => Navigator.pop(context)),
+              IconButton(
+                  icon: const Icon(Icons.close, color: Colors.grey),
+                  onPressed: () => Navigator.pop(context)),
             ],
           ),
           const SizedBox(height: 16),
@@ -565,12 +680,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             children: [
               Icon(Icons.tag_rounded, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
-              Text("Add tags to reach the right players", style: AppStyles.subHeading),
+              Text("Add tags to reach the right players",
+                  style: AppStyles.subHeading),
               const Spacer(),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                child: const Text("POST", style: TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12))),
+                child: const Text("POST",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],
           ),
