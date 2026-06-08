@@ -38,6 +38,47 @@ class ApiService {
     return res.statusCode == 200 || res.statusCode == 201;
   }
 
+  static Future<List<dynamic>> getPosts() async {
+    final res = await http.get(Uri.parse('$_baseUrl/posts'));
+    if (res.statusCode == 200) return jsonDecode(res.body);
+    return [];
+  }
+
+  static Future<Map<String, dynamic>> createPost(int userId, String content,
+      {List<String>? tags}) async {
+    final res = await http.post(
+      Uri.parse('$_baseUrl/posts'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'id_utilisateur': userId,
+        'contenu': content,
+        'tags': tags ?? [],
+      }),
+    );
+
+    if (res.statusCode == 201) {
+      return {'success': true, 'data': jsonDecode(res.body)};
+    }
+
+    final responseBody = res.body.isNotEmpty ? res.body : 'Unknown error';
+    try {
+      final parsed = jsonDecode(res.body);
+      if (parsed is Map<String, dynamic> && parsed.containsKey('error')) {
+        return {
+          'success': false,
+          'status': res.statusCode,
+          'error': parsed['error'] ?? responseBody,
+        };
+      }
+    } catch (_) {}
+
+    return {
+      'success': false,
+      'status': res.statusCode,
+      'error': responseBody,
+    };
+  }
+
   // ─── Groups ───────────────────────────────────────────────────────────────
   static Future<List<dynamic>> getGroupes() async {
     final res = await http.get(Uri.parse('$_baseUrl/groupes'));

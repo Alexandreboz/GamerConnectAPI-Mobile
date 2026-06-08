@@ -8,7 +8,7 @@ import 'profil.dart';
 import 'player_profile_page.dart';
 import 'evenement_page.dart';
 import 'actu_page.dart';
-import 'succes_page.dart';
+import 'trophies_page.dart';
 import 'groupes_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage>
   List<dynamic> _filteredPlayers = [];
   int? _currentUserId;
 
-  final List<Map<String, dynamic>> _feedItems = [
+  final List<Map<String, dynamic>> _sampleFeedItems = [
     {
       'user': 'ZeldaMaster',
       'avatar': 'Z',
@@ -69,6 +69,10 @@ class _HomePageState extends State<HomePage>
     },
   ];
 
+  List<dynamic> _feedItems = [];
+  bool _feedLoading = true;
+  late TextEditingController _postController;
+
   @override
   void initState() {
     super.initState();
@@ -77,8 +81,10 @@ class _HomePageState extends State<HomePage>
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
     _searchController.addListener(_onSearchChanged);
+    _postController = TextEditingController();
     _loadPlayers();
     _loadUser();
+    _loadFeed();
   }
 
   void _onSearchChanged() {
@@ -125,10 +131,87 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  Future<void> _loadFeed() async {
+    setState(() => _feedLoading = true);
+    try {
+      final data = await ApiService.getPosts();
+      if (!mounted) return;
+      setState(() {
+        _feedItems = data;
+        _feedLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _feedItems = [];
+        _feedLoading = false;
+      });
+    }
+  }
+
+  String _relativeTime(String? timestamp) {
+    if (timestamp == null || timestamp.isEmpty) return 'Just now';
+    try {
+      final date = DateTime.parse(timestamp);
+      final now = DateTime.now();
+      final diff = now.difference(date);
+      if (diff.inMinutes < 1) return 'Just now';
+      if (diff.inHours < 1) return '${diff.inMinutes}m ago';
+      if (diff.inDays < 1) return '${diff.inHours}h ago';
+      return '${diff.inDays}d ago';
+    } catch (_) {
+      return 'Just now';
+    }
+  }
+
+  Future<void> _submitPost() async {
+    final content = _postController.text.trim();
+    if (content.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Le post ne peut pas être vide.'),
+        backgroundColor: AppColors.accent,
+      ));
+      return;
+    }
+
+    final userId = await AuthService.getUserId();
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Vous devez être connecté pour poster.'),
+        backgroundColor: AppColors.accent,
+      ));
+      return;
+    }
+
+    final tags = RegExp(r'#[A-Za-z0-9_]+')
+        .allMatches(content)
+        .map((match) => match.group(0)!)
+        .toList();
+
+    final postResult = await ApiService.createPost(userId, content, tags: tags);
+    if (postResult['success'] == true) {
+      _postController.clear();
+      Navigator.pop(context);
+      await _loadFeed();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Post publié avec succès'),
+        backgroundColor: AppColors.green,
+      ));
+    } else {
+      final errorMessage =
+          postResult['error']?.toString() ?? 'Impossible de publier le post';
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Impossible de publier le post : $errorMessage'),
+        backgroundColor: AppColors.accent,
+      ));
+    }
+  }
+
   @override
   void dispose() {
     _onlineController.dispose();
     _searchController.dispose();
+    _postController.dispose();
     super.dispose();
   }
 
@@ -145,7 +228,7 @@ class _HomePageState extends State<HomePage>
                 color: AppColors.primary,
                 backgroundColor: AppColors.surface,
                 onRefresh: () async {
-                  await Future.delayed(const Duration(seconds: 1));
+                  await _loadFeed();
                 },
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
@@ -494,7 +577,7 @@ class _HomePageState extends State<HomePage>
         'label': 'TROPHIES',
         'icon': Icons.emoji_events_rounded,
         'color': AppColors.gold,
-        'page': SuccesPage()
+        'page': const TrophiesPage()
       },
       {
         'label': 'GROUPS',
@@ -551,13 +634,29 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget _buildFeed() {
+    if (_feedLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(40),
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
+    }
+
+    final items = _feedItems.isNotEmpty ? _feedItems : _sampleFeedItems;
     final filtered = _searchQuery.isEmpty
-        ? _feedItems
-        : _feedItems.where((f) {
+        ? items
+        : items.where((f) {
             final query = _searchQuery.toLowerCase();
-            final content = f['content']?.toString().toLowerCase() ?? '';
-            final user = f['user']?.toString().toLowerCase() ?? '';
-            final tags = (f['tags'] as List<dynamic>).join(' ').toLowerCase();
+            final content = f['content']?.toString().toLowerCase() ??
+                f['contenu']?.toString().toLowerCase() ??
+                '';
+            final user = f['pseudo']?.toString().toLowerCase() ??
+                f['user']?.toString().toLowerCase() ??
+                '';
+            final tags = (f['tags'] is List)
+                ? (f['tags'] as List<dynamic>).join(' ').toLowerCase()
+                : f['tags']?.toString().toLowerCase() ?? '';
             return content.contains(query) ||
                 user.contains(query) ||
                 tags.contains(query);
@@ -582,12 +681,36 @@ class _HomePageState extends State<HomePage>
     return Column(
       children: filtered.asMap().entries.map((e) {
         final i = e.key;
-        return _feedCard(e.value, i);
+        return _feedCard(e.value as Map<String, dynamic>, i);
       }).toList(),
     );
   }
 
   Widget _feedCard(Map<String, dynamic> item, int index) {
+    final user =
+        item['pseudo']?.toString() ?? item['user']?.toString() ?? 'Gamer';
+    final avatarColor = item['avatarColor'] is Color
+        ? item['avatarColor'] as Color
+        : AppColors.primary;
+    final avatar = user.isNotEmpty ? user[0].toUpperCase() : 'G';
+    final time = item['date_creation'] != null
+        ? _relativeTime(item['date_creation']?.toString())
+        : item['time']?.toString() ?? 'Just now';
+    final content =
+        item['content']?.toString() ?? item['contenu']?.toString() ?? '';
+    final tags = item['tags'] is List
+        ? List<String>.from(item['tags'] as List<dynamic>)
+        : item['tags']
+                ?.toString()
+                .split(',')
+                .map((tag) => tag.trim())
+                .where((tag) => tag.isNotEmpty)
+                .toList() ??
+            [];
+    final likes = item['likes'] is int ? item['likes'] as int : 0;
+    final comments = item['comments'] is int ? item['comments'] as int : 0;
+    final liked = item['liked'] is bool ? item['liked'] as bool : false;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(18),
@@ -601,16 +724,15 @@ class _HomePageState extends State<HomePage>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: (item['avatarColor'] as Color).withOpacity(0.2),
+                  color: avatarColor.withOpacity(0.2),
                   shape: BoxShape.circle,
-                  border:
-                      Border.all(color: item['avatarColor'] as Color, width: 2),
+                  border: Border.all(color: avatarColor, width: 2),
                 ),
                 child: Center(
                   child: Text(
-                    item['avatar'] as String,
+                    avatar,
                     style: TextStyle(
-                      color: item['avatarColor'] as Color,
+                      color: avatarColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -622,16 +744,16 @@ class _HomePageState extends State<HomePage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item['user'] as String,
+                    Text(user,
                         style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 15)),
                     Row(
                       children: [
-                        AppWidgets.onlineDot(online: index != 2),
+                        AppWidgets.onlineDot(online: index % 2 == 0),
                         const SizedBox(width: 5),
-                        Text(item['time'] as String,
+                        Text(time,
                             style: AppStyles.subHeading.copyWith(fontSize: 11)),
                       ],
                     ),
@@ -642,15 +764,16 @@ class _HomePageState extends State<HomePage>
             ],
           ),
           const SizedBox(height: 14),
-          Text(item['content'] as String, style: AppStyles.body),
+          Text(content, style: AppStyles.body),
           const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            children: (item['tags'] as List<String>)
-                .map((tag) => AppWidgets.badge(tag, AppColors.primary))
-                .toList(),
-          ),
-          const SizedBox(height: 16),
+          if (tags.isNotEmpty)
+            Wrap(
+              spacing: 8,
+              children: tags
+                  .map((tag) => AppWidgets.badge(tag, AppColors.primary))
+                  .toList(),
+            ),
+          if (tags.isNotEmpty) const SizedBox(height: 16),
           Divider(color: Colors.white.withOpacity(0.06), height: 1),
           const SizedBox(height: 12),
           Row(
@@ -658,26 +781,23 @@ class _HomePageState extends State<HomePage>
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    item['liked'] = !(item['liked'] as bool);
-                    item['likes'] = item['liked']
-                        ? (item['likes'] as int) + 1
-                        : (item['likes'] as int) - 1;
+                    item['liked'] = !liked;
+                    item['likes'] = liked ? likes - 1 : likes + 1;
                   });
                 },
                 child: Row(
                   children: [
                     Icon(
-                      item['liked']
+                      liked
                           ? Icons.favorite_rounded
                           : Icons.favorite_border_rounded,
-                      color: item['liked'] ? AppColors.accent : Colors.grey,
+                      color: liked ? AppColors.accent : Colors.grey,
                       size: 20,
                     ),
                     const SizedBox(width: 6),
-                    Text(item['likes'].toString(),
+                    Text(likes.toString(),
                         style: TextStyle(
-                            color:
-                                item['liked'] ? AppColors.accent : Colors.grey,
+                            color: liked ? AppColors.accent : Colors.grey,
                             fontSize: 13)),
                   ],
                 ),
@@ -688,7 +808,7 @@ class _HomePageState extends State<HomePage>
                   const Icon(Icons.chat_bubble_outline_rounded,
                       color: Colors.grey, size: 20),
                   const SizedBox(width: 6),
-                  Text(item['comments'].toString(),
+                  Text(comments.toString(),
                       style: const TextStyle(color: Colors.grey, fontSize: 13)),
                 ],
               ),
@@ -800,6 +920,7 @@ class _HomePageState extends State<HomePage>
           ),
           const SizedBox(height: 16),
           TextField(
+            controller: _postController,
             maxLines: 3,
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
@@ -823,7 +944,7 @@ class _HomePageState extends State<HomePage>
                   style: AppStyles.subHeading),
               const Spacer(),
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: _submitPost,
                 style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(

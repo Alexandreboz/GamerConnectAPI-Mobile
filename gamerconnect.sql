@@ -22,6 +22,15 @@ CREATE TABLE Profils (
     FOREIGN KEY (id_utilisateur) REFERENCES Utilisateurs(id_utilisateur) ON DELETE CASCADE
 );
 
+CREATE TABLE Posts (
+    id_post INT AUTO_INCREMENT PRIMARY KEY,
+    id_utilisateur INT NOT NULL,
+    contenu TEXT NOT NULL,
+    tags VARCHAR(255),
+    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_utilisateur) REFERENCES Utilisateurs(id_utilisateur) ON DELETE CASCADE
+);
+
 CREATE TABLE Messages (
     id_message INT AUTO_INCREMENT PRIMARY KEY,
     id_envoyeur INT NOT NULL,

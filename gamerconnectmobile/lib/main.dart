@@ -12,6 +12,7 @@ import 'screens/edit_profile_page.dart';
 import 'screens/evenement_page.dart';
 import 'screens/groupes_page.dart';
 import 'screens/actu_page.dart';
+import 'screens/trophies_page.dart';
 import 'screens/succes_page.dart';
 
 void main() {
@@ -69,6 +70,7 @@ class GamerConnectApp extends StatelessWidget {
         '/edit_profile': (context) => const EditProfilePage(),
         '/actu': (context) => ActuPage(),
         '/succes': (context) => SuccesPage(),
+        '/trophies': (context) => const TrophiesPage(),
       },
     );
   }

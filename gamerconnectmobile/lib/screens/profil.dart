@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/design_system.dart';
 import '../services/auth_service.dart';
 import 'settings_page.dart';
+import 'trophies_page.dart';
 import 'welcome.dart';
 
 class ProfilPage extends StatefulWidget {
@@ -148,7 +149,7 @@ class _ProfilPageState extends State<ProfilPage>
 
   Widget _buildSliverHeader() {
     return SliverAppBar(
-      expandedHeight: 280,
+      expandedHeight: 340,
       pinned: true,
       backgroundColor: AppColors.background,
       leading: const BackButton(color: Colors.white),
@@ -202,6 +203,7 @@ class _ProfilPageState extends State<ProfilPage>
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 50, 24, 0),
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       children: [
@@ -281,6 +283,28 @@ class _ProfilPageState extends State<ProfilPage>
                         _headerStat('5', 'EVENTS'),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const TrophiesPage()),
+                          );
+                        },
+                        icon: const Icon(Icons.emoji_events_rounded),
+                        label: const Text('Voir mes trophées'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.gold,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -325,6 +349,7 @@ class _ProfilPageState extends State<ProfilPage>
   Widget _buildOverviewTab() {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
+      primary: false,
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -468,6 +493,7 @@ class _ProfilPageState extends State<ProfilPage>
   Widget _buildGamesTab() {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
+      primary: false,
       padding: const EdgeInsets.all(20),
       child: Column(
         children: _favoriteGames.asMap().entries.map((e) {
@@ -544,6 +570,7 @@ class _ProfilPageState extends State<ProfilPage>
     };
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
+      primary: false,
       padding: const EdgeInsets.all(20),
       itemCount: _achievements.length,
       itemBuilder: (_, i) {
