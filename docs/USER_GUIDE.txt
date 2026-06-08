@@ -1,0 +1,53 @@
+USER GUIDE FOR GAMERCONNECT
+
+1. Overview
+GamerConnect is a social gaming app with a community feed, user profiles, trophies, events, and groups.
+
+2. Launching the app
+- Run the Flutter app from `gamerconnectmobile`.
+- Use a device, emulator, or simulator.
+- The app should connect to the backend API on `http://localhost:3000`.
+
+3. Main features
+- Home feed: view community posts loaded from the backend.
+- Quick post: write text posts and publish them to the global feed.
+- Profile: view your profile, update personal details, and access trophies.
+- Trophies page: view earned trophies and progress.
+- Groups and events: browse available groups and upcoming events.
+
+4. Using the home screen
+- The top section shows welcome info and navigation shortcuts.
+- Pull down to refresh the community feed.
+- Tap the quick post button to write and publish a new post.
+- Tags are extracted automatically from words starting with `#`.
+
+5. Publishing a post
+- Enter your message in the quick post text area.
+- The app verifies that you are logged in.
+- Tap publish to send the post to the backend.
+- If successful, the feed refreshes with the new post.
+
+6. Profile navigation
+- Open the profile page from the home screen.
+- From the profile, access the trophies section.
+- Update your profile information through the profile settings or edit pages.
+
+7. Viewing trophies
+- Use the trophies page to review badges and achievements.
+- The page lists milestones and earned trophies.
+
+8. Error handling
+- If posting fails, an error message will appear with the backend failure reason.
+- If the app cannot reach the API, verify the backend is running and the URL is correct.
+
+9. Recommended workflow
+- Open the app
+- Login or create an account
+- Publish a quick post
+- Refresh the feed
+- Navigate to profile and trophies
+
+10. Notes
+- For Android emulator: the app uses `10.0.2.2` to reach the host machine API.
+- For iOS simulator and desktop builds: the app uses `localhost`.
+- Ensure the backend is up before using social feed features.

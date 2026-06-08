@@ -1,0 +1,67 @@
+MAINTENANCE GUIDE FOR GAMERCONNECT
+
+1. Purpose
+This guide explains how to maintain and support the GamerConnect solution over time.
+
+2. Key components
+- Backend: `GamerConnectAPI/`
+- Frontend: `gamerconnectmobile/`
+- Database: MySQL, schema defined in `gamerconnect.sql`
+- Orchestration: `docker-compose.yml`
+
+3. Regular tasks
+- Update dependencies:
+    - Backend: `cd GamerConnectAPI && npm install`
+    - Frontend: `cd gamerconnectmobile && flutter pub get`
+- Rebuild Docker images after code changes:
+    docker compose build api
+- Restart services as needed:
+    docker compose restart api
+
+4. Database maintenance
+- Backup data regularly using MySQL export:
+    docker compose exec db mysqldump -u root -prootpassword GamerConnect > backup.sql
+- Restore data:
+    docker compose exec db mysql -u root -prootpassword GamerConnect < backup.sql
+- Check tables:
+    SHOW TABLES;
+- Fix missing table errors by reapplying `gamerconnect.sql` or creating missing table definitions.
+
+5. Logging and debugging
+- View backend logs:
+    docker compose logs --tail 100 api
+- Inspect Flutter runtime output from `flutter run` or the emulator console.
+- For API connection issues, verify `GamerConnectAPI/.env` and Docker Compose health.
+
+6. Troubleshooting
+- Backend cannot connect to MySQL:
+    - Ensure `db` container is healthy and running.
+    - Verify credentials in `GamerConnectAPI/.env`.
+    - Restart database container.
+- API returns 404 or missing route:
+    - Rebuild and restart backend container.
+    - Confirm file `server.js` includes `app.use('/posts', require('./routes/post.routes'));`.
+- Flutter cannot publish posts:
+    - Confirm API endpoint is reachable at `http://localhost:3000/posts`.
+    - Check emulator networking and API host settings.
+
+7. Version control
+- Commit source changes regularly.
+- Use descriptive commit messages for backend, frontend, and database updates.
+- Keep schema changes in `gamerconnect.sql` and document migrations clearly.
+
+8. Environment changes
+- When changing host or ports, update:
+    - `GamerConnectAPI/.env`
+    - `gamerconnectmobile/lib/services/api_host_nonweb.dart`
+    - `gamerconnectmobile/lib/services/api_host_web.dart`
+- Rebuild backend and rerun Flutter after config changes.
+
+9. Future upgrades
+- Migrate Node.js dependencies carefully when upgrading package versions.
+- Keep Flutter SDK compatible with current project dependencies.
+- Test API and mobile flows after each upgrade.
+
+10. Contact points
+- For backend issues: inspect `GamerConnectAPI/server.js`, `controllers/`, and `models/`
+- For frontend issues: inspect `gamerconnectmobile/lib/screens/home.dart`, `lib/services/api_service.dart`, and `lib/services/auth_service.dart`

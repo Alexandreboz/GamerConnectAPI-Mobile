@@ -1,0 +1,70 @@
+INSTALLER DOCUMENT FOR GAMERCONNECT PROJECT
+
+1. Objective
+This document explains how to deploy the GamerConnect solution from the provided source code.
+
+2. Prerequisites
+- Docker Desktop with Compose enabled
+- Node.js 18+ and npm
+- Flutter SDK and Dart
+- MySQL or Docker-managed MySQL
+- Git (optional)
+
+3. Source layout
+- `GamerConnectAPI/`: Node.js backend, controllers, models, routes, database connection
+- `gamerconnectmobile/`: Flutter client app
+- `docker-compose.yml`: service definitions for API, database, and mobile container
+- `gamerconnect.sql`: MySQL schema and table definitions
+
+4. Infrastructure deployment using Docker Compose
+From project root `GamerConnectAPI-Mobile`:
+    docker compose up -d
+
+Verify services:
+    docker compose ps
+
+Expected services:
+- `db`: MySQL database
+- `api`: Node.js backend API
+- `flutter`: Flutter web/app container
+
+5. Apply database schema
+If using Docker Compose, connect to the database container and create the table:
+    docker compose exec db mysql -u root -prootpassword GamerConnect < GamerConnectAPI/gamerconnect.sql
+
+If MySQL is installed locally:
+    mysql -u root -p GamerConnect < gamerconnect.sql
+
+6. Backend installation and startup
+Inside `GamerConnectAPI`:
+    npm install
+    npm start
+
+If using nodemon for development:
+    npm run dev
+
+7. Frontend installation and startup
+Inside `gamerconnectmobile`:
+    flutter pub get
+    flutter run
+
+8. Configuration details
+- Backend port: 3000
+- Database: GamerConnect
+- Environment file: `GamerConnectAPI/.env`
+- API host helpers:
+  - `gamerconnectmobile/lib/services/api_host_nonweb.dart`
+  - `gamerconnectmobile/lib/services/api_host_web.dart`
+
+9. Validation
+- Check MySQL tables:
+    SHOW TABLES;
+- Access API endpoint:
+    http://localhost:3000/posts
+- Check backend logs:
+    docker compose logs --tail 20 api
+
+10. Troubleshooting
+- If API returns 404 on `/posts`, rebuild/restart backend container
+- If database connection fails, verify MySQL service health
+- If Flutter cannot reach backend, verify emulator network and API base URL
