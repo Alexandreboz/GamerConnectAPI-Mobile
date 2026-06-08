@@ -114,6 +114,41 @@ class ApiService {
     return res.statusCode == 200 || res.statusCode == 201;
   }
 
+  static Future<Map<String, dynamic>> createGroupe(
+      int userId, String nomGroupe, String description) async {
+    final res = await http.post(
+      Uri.parse('$_baseUrl/groupes'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'nom_groupe': nomGroupe,
+        'description': description,
+        'id_utilisateur': userId,
+      }),
+    );
+
+    if (res.statusCode == 201) {
+      return {'success': true, 'data': jsonDecode(res.body)};
+    }
+
+    final responseBody = res.body.isNotEmpty ? res.body : 'Unknown error';
+    try {
+      final parsed = jsonDecode(res.body);
+      if (parsed is Map<String, dynamic> && parsed.containsKey('error')) {
+        return {
+          'success': false,
+          'status': res.statusCode,
+          'error': parsed['error'] ?? responseBody,
+        };
+      }
+    } catch (_) {}
+
+    return {
+      'success': false,
+      'status': res.statusCode,
+      'error': responseBody,
+    };
+  }
+
   static Future<Map<String, dynamic>?> sendMessage(
       int userId, int groupeId, String content) async {
     final res = await http.post(

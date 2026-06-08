@@ -26,7 +26,9 @@ class _GroupesPageState extends State<GroupesPage> {
       setState(() {
         _filtered = q.isEmpty
             ? List.from(_groupes)
-            : _groupes.where((g) => (g['nom_groupe'] ?? '').toLowerCase().contains(q)).toList();
+            : _groupes
+                .where((g) => (g['nom_groupe'] ?? '').toLowerCase().contains(q))
+                .toList();
       });
     });
   }
@@ -35,7 +37,12 @@ class _GroupesPageState extends State<GroupesPage> {
     _userId = await AuthService.getUserId();
     try {
       final data = await ApiService.getGroupes();
-      if (mounted) setState(() { _groupes = data; _filtered = List.from(data); _loading = false; });
+      if (mounted)
+        setState(() {
+          _groupes = data;
+          _filtered = List.from(data);
+          _loading = false;
+        });
     } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
@@ -47,12 +54,106 @@ class _GroupesPageState extends State<GroupesPage> {
     try {
       await ApiService.rejoindreGroupe(id, _userId!);
       if (mounted) {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (_) => DiscussionGroupePage(idGroupe: id, nomGroupe: groupe['nom_groupe']),
-        ));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DiscussionGroupePage(
+                  idGroupe: id, nomGroupe: groupe['nom_groupe']),
+            ));
       }
     } catch (_) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Erreur de connexion")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Erreur de connexion")));
+    }
+  }
+
+  Future<void> _showCreateGroupDialog() async {
+    final nameCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text('Nouveau canal de discussion',
+            style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameCtrl,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                hintText: 'Nom du canal',
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: descCtrl,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                hintText: 'Description (facultatif)',
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Annuler',
+                style: TextStyle(color: AppColors.accent)),
+          ),
+          TextButton(
+            onPressed: () {
+              final name = nameCtrl.text.trim();
+              final description = descCtrl.text.trim();
+              if (name.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('Le nom du canal est requis.'),
+                  backgroundColor: AppColors.accent,
+                ));
+                return;
+              }
+              Navigator.pop(context);
+              _createGroup(name, description);
+            },
+            child:
+                const Text('Créer', style: TextStyle(color: AppColors.primary)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _createGroup(String nomGroupe, String description) async {
+    if (_userId == null) return;
+    final result =
+        await ApiService.createGroupe(_userId!, nomGroupe, description);
+
+    if (result['success'] == true) {
+      await _load();
+      final groupe = result['data'];
+      if (mounted) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DiscussionGroupePage(
+                idGroupe: groupe['id_groupe'],
+                nomGroupe: groupe['nom_groupe'],
+              ),
+            ));
+      }
+    } else {
+      final errorMessage =
+          result['error']?.toString() ?? 'Erreur lors de la création du groupe';
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(errorMessage),
+        backgroundColor: AppColors.accent,
+      ));
     }
   }
 
@@ -66,7 +167,14 @@ class _GroupesPageState extends State<GroupesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("GAMING GROUPS", style: AppStyles.heading.copyWith(fontSize: 18)),
+        title: Text("GAMING GROUPS",
+            style: AppStyles.heading.copyWith(fontSize: 18)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_rounded, color: Colors.white),
+            onPressed: _showCreateGroupDialog,
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -84,11 +192,15 @@ class _GroupesPageState extends State<GroupesPage> {
                 decoration: InputDecoration(
                   hintText: "Recherche un groupe...",
                   hintStyle: AppStyles.subHeading,
-                  prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                  prefixIcon:
+                      const Icon(Icons.search, color: AppColors.primary),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 14),
                   suffixIcon: _search.text.isNotEmpty
-                      ? IconButton(icon: const Icon(Icons.clear, color: Colors.grey, size: 18), onPressed: () => _search.clear())
+                      ? IconButton(
+                          icon: const Icon(Icons.clear,
+                              color: Colors.grey, size: 18),
+                          onPressed: () => _search.clear())
                       : null,
                 ),
               ),
@@ -100,13 +212,20 @@ class _GroupesPageState extends State<GroupesPage> {
               backgroundColor: AppColors.surface,
               onRefresh: _load,
               child: _loading
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                  ? const Center(
+                      child:
+                          CircularProgressIndicator(color: AppColors.primary))
                   : _filtered.isEmpty
-                      ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          const Icon(Icons.search_off_rounded, color: Colors.grey, size: 60),
-                          const SizedBox(height: 12),
-                          Text("Aucun groupe trouvé", style: AppStyles.subHeading),
-                        ]))
+                      ? Center(
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                              const Icon(Icons.search_off_rounded,
+                                  color: Colors.grey, size: 60),
+                              const SizedBox(height: 12),
+                              Text("Aucun groupe trouvé",
+                                  style: AppStyles.subHeading),
+                            ]))
                       : ListView.builder(
                           physics: const BouncingScrollPhysics(),
                           padding: const EdgeInsets.all(20),
@@ -123,7 +242,12 @@ class _GroupesPageState extends State<GroupesPage> {
   Widget _groupCard(dynamic groupe, int index) {
     final name = groupe['nom_groupe'] ?? 'Groupe';
     final desc = groupe['description'] ?? 'Rejoins la discussion !';
-    final colors = [AppColors.primary, AppColors.secondary, AppColors.orange, AppColors.accent];
+    final colors = [
+      AppColors.primary,
+      AppColors.secondary,
+      AppColors.orange,
+      AppColors.accent
+    ];
     final color = colors[index % colors.length];
     return GestureDetector(
       onTap: () => _join(groupe),
@@ -134,14 +258,17 @@ class _GroupesPageState extends State<GroupesPage> {
         child: Row(
           children: [
             Container(
-              width: 50, height: 50,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [color.withOpacity(0.3), color.withOpacity(0.05)]),
+                gradient: LinearGradient(
+                    colors: [color.withOpacity(0.3), color.withOpacity(0.05)]),
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(name[0].toUpperCase(),
-                    style: AppStyles.heading.copyWith(fontSize: 20, color: color)),
+                    style:
+                        AppStyles.heading.copyWith(fontSize: 20, color: color)),
               ),
             ),
             const SizedBox(width: 16),
@@ -149,9 +276,16 @@ class _GroupesPageState extends State<GroupesPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(name,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16)),
                   const SizedBox(height: 4),
-                  Text(desc, style: AppStyles.subHeading.copyWith(fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(desc,
+                      style: AppStyles.subHeading.copyWith(fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),
@@ -162,11 +296,19 @@ class _GroupesPageState extends State<GroupesPage> {
                 gradient: AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text("REJOINDRE", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+              child: const Text("REJOINDRE",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.8)),
             ),
           ],
         ),
-      ).animate().fadeIn(delay: Duration(milliseconds: 80 * index)).slideX(begin: 0.1),
+      )
+          .animate()
+          .fadeIn(delay: Duration(milliseconds: 80 * index))
+          .slideX(begin: 0.1),
     );
   }
 }

@@ -51,6 +51,38 @@ exports.getAllGroupes = (req, res) => {
   });
 };
 
+// ➕ Créer un nouveau groupe
+exports.createGroupe = (req, res) => {
+  const { nom_groupe, description = '', id_utilisateur } = req.body;
+
+  if (!nom_groupe || !id_utilisateur) {
+    return res.status(400).json({ error: 'nom_groupe et id_utilisateur sont requis' });
+  }
+
+  const query = `
+    INSERT INTO Groupes (nom_groupe, description)
+    VALUES (?, ?)
+  `;
+
+  db.query(query, [nom_groupe, description], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Erreur SQL lors de la création du groupe' });
+
+    const groupId = result.insertId;
+    const memberQuery = `
+      INSERT INTO Membres_Groupe (id_utilisateur, id_groupe)
+      VALUES (?, ?)
+    `;
+
+    db.query(memberQuery, [id_utilisateur, groupId], (memberErr) => {
+      if (memberErr) {
+        return res.status(500).json({ error: 'Impossible d’ajouter le créateur au groupe' });
+      }
+
+      res.status(201).json({ id_groupe: groupId, nom_groupe, description });
+    });
+  });
+};
+
 // 💬 Obtenir les messages d’un groupe
 exports.getMessagesDuGroupe = (req, res) => {
   const id_groupe = req.params.id;
