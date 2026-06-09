@@ -177,6 +177,42 @@ class ApiService {
     return null;
   }
 
+  static Future<Map<String, dynamic>> createEvenement(
+    int idOrganisateur,
+    String nomEvenement,
+    String description,
+    String dateEvenement,
+    String jeu,
+    String lieu,
+  ) async {
+    final res = await http.post(
+      Uri.parse('$_baseUrl/evenements'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'id_organisateur': idOrganisateur,
+        'nom_evenement': nomEvenement,
+        'description': description,
+        'date_evenement': dateEvenement,
+        'jeu': jeu,
+        'lieu': lieu,
+      }),
+    );
+
+    if (res.statusCode == 201) {
+      return {'success': true, 'data': jsonDecode(res.body)};
+    }
+
+    var error = 'Erreur lors de la création de l\'événement.';
+    try {
+      final parsed = jsonDecode(res.body);
+      if (parsed is Map<String, dynamic> && parsed['error'] != null) {
+        error = parsed['error'].toString();
+      }
+    } catch (_) {}
+
+    return {'success': false, 'status': res.statusCode, 'error': error};
+  }
+
   static Future<bool> participerEvenement(int eventId, int userId,
       {bool join = true}) async {
     final res = await http.post(

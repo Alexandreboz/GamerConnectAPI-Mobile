@@ -8,6 +8,22 @@ exports.getEvents = (req, res) => {
   });
 };
 
+exports.createEvent = (req, res) => {
+  const { nom_evenement, description, date_evenement, jeu, lieu, id_organisateur } = req.body;
+
+  if (!nom_evenement || !description || !date_evenement || !jeu || !lieu || !id_organisateur) {
+    return res.status(400).json({ error: "Tous les champs sont requis pour créer un événement" });
+  }
+
+  Event.createEvent(
+    { nom_evenement, description, date_evenement, jeu, lieu, id_organisateur },
+    (err, result) => {
+      if (err) return res.status(500).json({ error: "Erreur SQL lors de la création de l'événement" });
+      res.status(201).json({ message: "Événement créé", id_evenement: result.insertId });
+    }
+  );
+};
+
 exports.getEventById = (req, res) => {
   Event.getEventById(req.params.id, (err, results) => {
     if (err) return res.status(500).json(err);

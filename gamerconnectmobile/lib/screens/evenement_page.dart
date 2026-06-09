@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/design_system.dart';
 import '../route_observer.dart';
+import 'add_evenement_page.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 
@@ -116,6 +117,28 @@ class _EvenementPageState extends State<EvenementPage> with RouteAware {
       appBar: AppBar(
         title: Text("GAMING EVENTS",
             style: AppStyles.heading.copyWith(fontSize: 18)),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          if (_userId == null) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Connecte-toi pour créer un événement'),
+              backgroundColor: Color(0xFFEF5350),
+            ));
+            return;
+          }
+          final result = await Navigator.of(context).push<bool>(
+            MaterialPageRoute(
+              builder: (_) => AddEvenementPage(userId: _userId!),
+            ),
+          );
+          if (result == true) {
+            _load();
+          }
+        },
+        label: const Text('Ajouter'),
+        icon: const Icon(Icons.add),
+        backgroundColor: AppColors.primary,
       ),
       body: RefreshIndicator(
         color: AppColors.primary,

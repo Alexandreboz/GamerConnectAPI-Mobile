@@ -27,7 +27,28 @@ const getEventById = (id, callback) => {
   db.query(sql, [id], callback);
 };
 
+const createEvent = (eventData, callback) => {
+  const sql = `
+    INSERT INTO Evenements
+      (nom_evenement, description, date_evenement, jeu, lieu, id_organisateur)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+  db.query(
+    sql,
+    [
+      eventData.nom_evenement,
+      eventData.description,
+      eventData.date_evenement,
+      eventData.jeu,
+      eventData.lieu,
+      eventData.id_organisateur,
+    ],
+    callback
+  );
+};
+
 module.exports = {
   getAllEvents,
   getEventById,
+  createEvent,
 };
