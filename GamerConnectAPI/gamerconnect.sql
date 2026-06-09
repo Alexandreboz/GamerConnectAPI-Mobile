@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS GamerConnect;
+CREATE DATABASE IF NOT EXISTS GamerConnect CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE GamerConnect;
 
 CREATE TABLE Utilisateurs (
@@ -64,7 +64,7 @@ CREATE TABLE Evenements (
     date_evenement DATETIME NOT NULL,
     id_organisateur INT NOT NULL,
     FOREIGN KEY (id_organisateur) REFERENCES Utilisateurs(id_utilisateur) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Participants (
     id_participant INT AUTO_INCREMENT PRIMARY KEY,
@@ -73,7 +73,7 @@ CREATE TABLE Participants (
     statut ENUM('Confirmé', 'En attente', 'Refusé') DEFAULT 'En attente',
     FOREIGN KEY (id_evenement) REFERENCES Evenements(id_evenement) ON DELETE CASCADE,
     FOREIGN KEY (id_utilisateur) REFERENCES Utilisateurs(id_utilisateur) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE Ressources_Educatives (
     id_ressource INT AUTO_INCREMENT PRIMARY KEY,
@@ -88,6 +88,7 @@ CREATE TABLE Ressources_Educatives (
 CREATE TABLE Badges (
     id_badge INT AUTO_INCREMENT PRIMARY KEY,
     nom_badge VARCHAR(100) NOT NULL,
+    jeu VARCHAR(100),
     description TEXT,
     conditions TEXT
 );

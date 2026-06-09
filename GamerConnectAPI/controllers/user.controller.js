@@ -55,6 +55,27 @@ exports.updateUser = (req, res) => {
   );
 };
 
+exports.getUserBadges = (req, res) => {
+  const id = req.params.id;
+  const sql = `
+    SELECT
+      b.id_badge,
+      b.nom_badge,
+      b.description,
+      b.conditions,
+      o.date_obtention
+    FROM Obtention_Badges o
+    JOIN Badges b ON o.id_badge = b.id_badge
+    WHERE o.id_utilisateur = ?
+    ORDER BY o.date_obtention DESC
+  `;
+
+  db.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: "Erreur serveur" });
+    res.json(results);
+  });
+};
+
 exports.deleteUser = (req, res) => {
   db.query("DELETE FROM Utilisateurs WHERE id_utilisateur = ?", [req.params.id], (err) => {
     if (err) return res.status(500).json({ error: "Erreur serveur" });
