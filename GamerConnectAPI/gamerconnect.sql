@@ -137,8 +137,18 @@ INSERT INTO Utilisateurs (nom, prenom,pseudo, email, mot_de_passe, plateformes_l
 ('Martin', 'Claire','clairem', 'claire.martin@email.com', 'hashedpassword456', 'Xbox,Steam');
 
 -- Ajouter un événement
-INSERT INTO Evenements (nom_evenement, description, date_evenement, id_organisateur) VALUES
-('Tournoi FIFA 23', 'Tournoi en ligne pour FIFA 23', '2024-06-15 18:00:00', 1);
+INSERT INTO Evenements (nom_evenement, description, date_evenement, jeu, lieu, id_organisateur) VALUES
+('Tournoi FIFA 23', 'Tournoi en ligne pour FIFA 23', '2024-06-15 18:00:00', 'FIFA', 'Paris Arena', 1),
+('Soirée Rocket League', 'Session 3v3 pour progresser en équipe.', '2024-07-02 20:00:00', 'Rocket League', 'E-sport Zone', 2),
+('Marathon Mario Kart', 'Course non-stop autour des circuits les plus fous.', '2024-07-05 18:30:00', 'Mario Kart', 'Lounge Gamer', 1),
+('Nuit Valorant', 'Des matchs compétitifs en 5v5 pour grimper.', '2024-07-10 21:00:00', 'Valorant', 'Cyber Arena', 2),
+('Challenge Apex Legends', 'Affrontez des équipes pour décrocher la victoire.', '2024-07-15 19:30:00', 'Apex Legends', 'Gaming House', 1),
+('Tournoi League of Legends', 'Brackets éliminatoires 5v5.', '2024-07-20 20:00:00', 'League of Legends', 'Stade Virtuel', 2),
+('Camp d’entraînement CS:GO', 'Améliore ton aim et ta stratégie en team.', '2024-07-25 18:00:00', 'CS:GO', 'Arena 5', 1),
+('Session Co-op Diablo IV', 'Explorez les donjons ensemble.', '2024-07-28 19:00:00', 'Diablo IV', 'Dark Cellar', 2),
+('Soirée Fortnite', 'Battle Royale détendu entre amis.', '2024-08-01 20:30:00', 'Fortnite', 'Rooftop Party', 1),
+('Compétition Overwatch 2', 'Des affrontements en escouade serrés.', '2024-08-05 19:00:00', 'Overwatch 2', 'E-Sport Café', 2),
+('Tournoi Super Smash Bros.', 'Combattez pour le titre du meilleur joueur.', '2024-08-10 18:00:00', 'Super Smash Bros.', 'Retro Lounge', 1);
 
 INSERT INTO Groupes (nom_groupe, description)
 VALUES ('Dofus', 'Groupe de soutiens des nouveaux joueurs sur tous les serveurs');

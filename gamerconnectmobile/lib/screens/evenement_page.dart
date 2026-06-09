@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/design_system.dart';
+import '../route_observer.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
-import 'evenement_detail_page.dart';
 
 class EvenementPage extends StatefulWidget {
   const EvenementPage({super.key});
@@ -12,7 +12,7 @@ class EvenementPage extends StatefulWidget {
   State<EvenementPage> createState() => _EvenementPageState();
 }
 
-class _EvenementPageState extends State<EvenementPage> {
+class _EvenementPageState extends State<EvenementPage> with RouteAware {
   List _events = [];
   bool _loading = true;
   int? _userId;
@@ -50,6 +50,26 @@ class _EvenementPageState extends State<EvenementPage> {
   @override
   void initState() {
     super.initState();
+    _load();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
     _load();
   }
 
@@ -274,19 +294,19 @@ class _EvenementPageState extends State<EvenementPage> {
                                 if (!mounted) return;
                                 if (success) {
                                   setState(() {
+                                    final currentParticipants = int.tryParse(
+                                            '${e['participants'] ?? 0}') ??
+                                        0;
                                     if (nextJoined) {
                                       _joined.add(id);
-                                      if (e['participants'] is int) {
-                                        e['participants'] =
-                                            (e['participants'] as int) + 1;
-                                      }
+                                      e['participants'] =
+                                          currentParticipants + 1;
                                     } else {
                                       _joined.remove(id);
-                                      if (e['participants'] is int &&
-                                          (e['participants'] as int) > 0) {
-                                        e['participants'] =
-                                            (e['participants'] as int) - 1;
-                                      }
+                                      e['participants'] =
+                                          (currentParticipants > 0)
+                                              ? currentParticipants - 1
+                                              : 0;
                                     }
                                   });
                                 }

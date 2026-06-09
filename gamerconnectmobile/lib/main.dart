@@ -14,6 +14,7 @@ import 'screens/groupes_page.dart';
 import 'screens/actu_page.dart';
 import 'screens/trophies_page.dart';
 import 'screens/succes_page.dart';
+import 'route_observer.dart';
 
 void main() {
   runApp(const GamerConnectApp());
@@ -57,6 +58,7 @@ class GamerConnectApp extends StatelessWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
+      navigatorObservers: [routeObserver],
       home: const _SplashRouter(),
       routes: {
         '/welcome': (context) => WelcomePage(),

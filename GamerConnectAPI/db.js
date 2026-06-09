@@ -14,6 +14,16 @@ db.connect((err) => {
   } else {
     console.log("Connexion à la base MySQL réussie !");
     db.query(
+      "ALTER TABLE Evenements ADD COLUMN IF NOT EXISTS jeu VARCHAR(100), ADD COLUMN IF NOT EXISTS lieu VARCHAR(255)",
+      (alterErr) => {
+        if (alterErr) {
+          console.error("Impossible d'ajouter les colonnes jeu/lieu à Evenements :", alterErr.message);
+        } else {
+          console.log("Colonnes jeu/lieu dans Evenements vérifiées.");
+        }
+      }
+    );
+    db.query(
       "ALTER TABLE Participants MODIFY statut ENUM('Confirmé','En attente','Refusé') DEFAULT 'En attente'",
       (alterErr) => {
         if (alterErr) {
