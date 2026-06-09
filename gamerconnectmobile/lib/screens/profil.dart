@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/design_system.dart';
+import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import 'settings_page.dart';
 import 'trophies_page.dart';
 import 'welcome.dart';
 
 class ProfilPage extends StatefulWidget {
+  const ProfilPage({super.key});
+
   @override
   State<ProfilPage> createState() => _ProfilPageState();
 }
@@ -15,6 +18,9 @@ class _ProfilPageState extends State<ProfilPage>
     with SingleTickerProviderStateMixin {
   String _pseudo = 'Legend';
   late TabController _tabController;
+  bool _eventsLoading = true;
+  List<dynamic> _registeredEvents = [];
+  int _registeredEventCount = 0;
 
   final List<Map<String, dynamic>> _favoriteGames = [
     {
@@ -110,11 +116,66 @@ class _ProfilPageState extends State<ProfilPage>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadUser();
+    _loadRegisteredEvents();
   }
 
   Future<void> _loadUser() async {
     final pseudo = await AuthService.getPseudo();
     if (mounted) setState(() => _pseudo = pseudo);
+  }
+
+  Future<void> _loadRegisteredEvents() async {
+    final userId = await AuthService.getUserId();
+    if (userId == null) {
+      if (mounted) {
+        setState(() {
+          _registeredEvents = [];
+          _registeredEventCount = 0;
+          _eventsLoading = false;
+        });
+      }
+      return;
+    }
+
+    try {
+      final registered = await ApiService.getEvenementsInscrits(userId);
+      final ids = registered
+          .where((item) => item != null)
+          .map<int>((item) {
+            if (item is int) return item;
+            if (item is Map && item['id_evenement'] != null) {
+              return item['id_evenement'] as int;
+            }
+            return 0;
+          })
+          .where((id) => id > 0)
+          .toSet()
+          .toList();
+
+      final events = <dynamic>[];
+      for (final id in ids) {
+        final event = await ApiService.getEvenementById(id);
+        if (event != null) {
+          events.add(event);
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _registeredEvents = events;
+          _registeredEventCount = events.length;
+          _eventsLoading = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _registeredEvents = [];
+          _registeredEventCount = 0;
+          _eventsLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -213,7 +274,7 @@ class _ProfilPageState extends State<ProfilPage>
                           children: [
                             Container(
                               padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: AppColors.primaryGradient,
                               ),
@@ -280,7 +341,7 @@ class _ProfilPageState extends State<ProfilPage>
                         _headerStat('150', 'TROPHIES'),
                         _headerStat('42', 'FRIENDS'),
                         _headerStat('8', 'GROUPS'),
-                        _headerStat('5', 'EVENTS'),
+                        _headerStat(_registeredEventCount.toString(), 'EVENTS'),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -324,6 +385,50 @@ class _ProfilPageState extends State<ProfilPage>
               style: AppStyles.label.copyWith(fontSize: 9, color: Colors.grey)),
         ],
       );
+
+  Widget _buildEventsSection() {
+    if (_eventsLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
+      );
+    }
+
+    if (_registeredEvents.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: Text('Aucun événement inscrit pour le moment.',
+              style: AppStyles.subHeading),
+        ),
+      );
+    }
+
+    return Column(
+      children: _registeredEvents.map((event) {
+        final title = event['titre']?.toString() ?? 'Événement';
+        final date = event['date']?.toString() ?? 'Date inconnue';
+        final lieu = event['lieu']?.toString() ?? 'Lieu inconnu';
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(14),
+          decoration: AppStyles.cardDecoration,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: AppStyles.heading.copyWith(fontSize: 14)),
+              const SizedBox(height: 6),
+              Text('$lieu • $date',
+                  style: AppStyles.subHeading.copyWith(color: Colors.grey)),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
 
   Widget _buildTabBar() {
     return Container(
@@ -418,6 +523,11 @@ class _ProfilPageState extends State<ProfilPage>
               ],
             ),
           ).animate().fadeIn(delay: const Duration(milliseconds: 300)),
+
+          const SizedBox(height: 28),
+          AppWidgets.sectionHeader("MES ÉVÉNEMENTS"),
+          const SizedBox(height: 16),
+          _buildEventsSection(),
 
           const SizedBox(height: 28),
           SizedBox(
