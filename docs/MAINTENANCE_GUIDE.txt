@@ -17,6 +17,8 @@ This guide explains how to maintain and support the GamerConnect solution over t
     docker compose build api
 - Restart services as needed:
     docker compose restart api
+- Recreate Docker services when dependencies change:
+    docker compose up --build -d
 
 4. Database maintenance
 - Backup data regularly using MySQL export:
@@ -25,11 +27,13 @@ This guide explains how to maintain and support the GamerConnect solution over t
     docker compose exec db mysql -u root -prootpassword GamerConnect < backup.sql
 - Check tables:
     SHOW TABLES;
-- Fix missing table errors by reapplying `gamerconnect.sql` or creating missing table definitions.
+- Fix missing table errors by reapplying `gamerconnect.sql` or verifying the backend startup scripts.
 
 5. Logging and debugging
 - View backend logs:
     docker compose logs --tail 100 api
+- View database logs:
+    docker compose logs --tail 100 db
 - Inspect Flutter runtime output from `flutter run` or the emulator console.
 - For API connection issues, verify `GamerConnectAPI/.env` and Docker Compose health.
 
@@ -37,18 +41,24 @@ This guide explains how to maintain and support the GamerConnect solution over t
 - Backend cannot connect to MySQL:
     - Ensure `db` container is healthy and running.
     - Verify credentials in `GamerConnectAPI/.env`.
+    - Check `DB_HOST` for Docker (`gamerconnect-mysql`) vs local MySQL (`localhost`).
     - Restart database container.
 - API returns 404 or missing route:
     - Rebuild and restart backend container.
-    - Confirm file `server.js` includes `app.use('/posts', require('./routes/post.routes'));`.
-- Flutter cannot publish posts:
-    - Confirm API endpoint is reachable at `http://localhost:3000/posts`.
-    - Check emulator networking and API host settings.
+    - Confirm `server.js` includes:
+        app.use('/forums', require('./routes/forums.routes'));
+        app.use('/posts', require('./routes/post.routes'));
+        app.use('/messages', require('./routes/message.routes'));
+    - Verify the requested URL matches the API base URL and port.
+- Flutter cannot reach backend:
+    - Confirm the API is reachable at `http://localhost:3000` or the configured host.
+    - For Android emulator, use `10.0.2.2`.
+    - For physical devices, use the host machine IP.
 
-7. Version control
-- Commit source changes regularly.
-- Use descriptive commit messages for backend, frontend, and database updates.
-- Keep schema changes in `gamerconnect.sql` and document migrations clearly.
+7. Maintenance after feature changes
+- After adding or modifying API endpoints, update documentation and redeploy the backend.
+- Verify new routes such as `/forums`, `/forums/:forumId/messages`, and `/posts`.
+- Ensure frontend API helper files are updated when the backend URL or port changes.
 
 8. Environment changes
 - When changing host or ports, update:

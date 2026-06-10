@@ -4,7 +4,7 @@ ENVIRONMENT SETUP FOR GAMERCONNECT PROJECT
 - GamerConnectAPI/: Node.js/Express backend and MySQL integration
 - gamerconnectmobile/: Flutter mobile application
 - docker-compose.yml: Docker services for backend API, MySQL, and Flutter app
-- gamerconnect.sql: MySQL database schema for GamerConnect
+- gamerconnect.sql: MySQL database schema and seed data
 
 2. Required software
 - Windows 10/11 or compatible OS
@@ -17,7 +17,7 @@ ENVIRONMENT SETUP FOR GAMERCONNECT PROJECT
 - Backend source: GamerConnectAPI/
 - Database connection file: GamerConnectAPI/db.js
 - Environment config: GamerConnectAPI/.env
-- `.env` values used by backend:
+- Default `.env` values used by backend:
     DB_HOST=gamerconnect-mysql
     DB_USER=gameruser
     DB_PASSWORD=gamerpass
@@ -31,15 +31,17 @@ From the project root `GamerConnectAPI-Mobile`:
 This starts:
 - `db`: MySQL 8.0 container
 - `api`: Node.js backend container
-- `flutter`: Flutter app container (for web or development preview)
+- `flutter`: Flutter container for the mobile/web frontend
 
 5. Backend local setup without Docker
 If Docker is not used:
 - Install MySQL and create a database named `GamerConnect`
-- Execute the SQL script: `mysql -u root -p GamerConnect < gamerconnect.sql`
+- Execute the SQL script: `mysql -u root -p GamerConnect < GamerConnectAPI/gamerconnect.sql`
 - Install backend dependencies:
     cd GamerConnectAPI
     npm install
+- Update `GamerConnectAPI/.env` to use local database host:
+    DB_HOST=localhost
 - Start backend:
     npm start
 
@@ -55,6 +57,7 @@ Run the Flutter app on your target device/emulator:
 - Android emulator uses `10.0.2.2`
 - iOS simulator and desktop use `localhost`
 - Web builds use `lib/services/api_host_web.dart`
+- When running the backend locally on another machine, update `api_host_nonweb.dart` or `api_host_web.dart` accordingly.
 
 8. Useful commands
 - Show Docker status:
@@ -67,6 +70,7 @@ Run the Flutter app on your target device/emulator:
     docker compose restart api
 
 9. Notes
-- The backend exposes `http://localhost:3000` from the host machine.
-- The frontend expects the API to be accessible on port 3000.
-- If using a physical Android device, swap `10.0.2.2` for the host machine IP.
+- The backend exposes `http://localhost:3000` from the host machine in default setup.
+- If using Docker Compose, the backend connects to the database container via `gamerconnect-mysql`.
+- If using a local MySQL instance instead of Docker, set `DB_HOST=localhost`.
+- If using a physical Android device, replace `10.0.2.2` with the host machine IP.

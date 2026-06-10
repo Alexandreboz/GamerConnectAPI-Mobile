@@ -1,7 +1,7 @@
 USER GUIDE FOR GAMERCONNECT
 
 1. Overview
-GamerConnect is a social gaming app with a community feed, user profiles, trophies, events, and groups.
+GamerConnect is a social gaming app with a community feed, user profiles, trophies, events, groups, and forums.
 
 2. Launching the app
 - Run the Flutter app from `gamerconnectmobile`.
@@ -11,43 +11,45 @@ GamerConnect is a social gaming app with a community feed, user profiles, trophi
 3. Main features
 - Home feed: view community posts loaded from the backend.
 - Quick post: write text posts and publish them to the global feed.
+- Forums: browse per-game forums, create new forums, and participate in discussions.
 - Profile: view your profile, update personal details, and access trophies.
 - Trophies page: view earned trophies and progress.
 - Groups and events: browse available groups and upcoming events.
 
-4. Using the home screen
+4. Using the forum section
+- Open the forum page from the navigation menu.
+- Browse available game forums and tap a forum to enter the discussion.
+- Use the create forum button to add a new forum for any game.
+- Inside a forum, read messages and post replies to participate.
+- Forum administrators can also manage forums from the management page.
+
+5. Using the home screen
 - The top section shows welcome info and navigation shortcuts.
 - Pull down to refresh the community feed.
 - Tap the quick post button to write and publish a new post.
 - Tags are extracted automatically from words starting with `#`.
 
-5. Publishing a post
+6. Publishing a post
 - Enter your message in the quick post text area.
 - The app verifies that you are logged in.
 - Tap publish to send the post to the backend.
 - If successful, the feed refreshes with the new post.
 
-6. Profile navigation
+7. Profile navigation
 - Open the profile page from the home screen.
 - From the profile, access the trophies section.
 - Update your profile information through the profile settings or edit pages.
 
-7. Viewing trophies
+8. Viewing trophies
 - Use the trophies page to review badges and achievements.
 - The page lists milestones and earned trophies.
 
-8. Error handling
+9. Error handling
 - If posting fails, an error message will appear with the backend failure reason.
-- If the app cannot reach the API, verify the backend is running and the URL is correct.
-
-9. Recommended workflow
-- Open the app
-- Login or create an account
-- Publish a quick post
-- Refresh the feed
-- Navigate to profile and trophies
+- If forum creation fails, verify the backend is running and the API route is reachable.
+- If the app cannot reach the API, ensure the backend is running and the URL is correct.
 
 10. Notes
 - For Android emulator: the app uses `10.0.2.2` to reach the host machine API.
 - For iOS simulator and desktop builds: the app uses `localhost`.
-- Ensure the backend is up before using social feed features.
+- Ensure the backend is up before using social feed and forum features.

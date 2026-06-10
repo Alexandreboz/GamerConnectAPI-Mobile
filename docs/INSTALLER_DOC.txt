@@ -12,9 +12,9 @@ This document explains how to deploy the GamerConnect solution from the provided
 
 3. Source layout
 - `GamerConnectAPI/`: Node.js backend, controllers, models, routes, database connection
-- `gamerconnectmobile/`: Flutter client app
+- `gamerconnectmobile/`: Flutter mobile app
 - `docker-compose.yml`: service definitions for API, database, and mobile container
-- `gamerconnect.sql`: MySQL schema and table definitions
+- `gamerconnect.sql`: MySQL schema and seed data
 
 4. Infrastructure deployment using Docker Compose
 From project root `GamerConnectAPI-Mobile`:
@@ -26,21 +26,21 @@ Verify services:
 Expected services:
 - `db`: MySQL database
 - `api`: Node.js backend API
-- `flutter`: Flutter web/app container
+- `flutter`: Flutter frontend container
 
 5. Apply database schema
-If using Docker Compose, connect to the database container and create the table:
+If using Docker Compose, the backend container will initialize tables automatically, but you can also load the schema manually:
     docker compose exec db mysql -u root -prootpassword GamerConnect < GamerConnectAPI/gamerconnect.sql
 
 If MySQL is installed locally:
-    mysql -u root -p GamerConnect < gamerconnect.sql
+    mysql -u root -p GamerConnect < GamerConnectAPI/gamerconnect.sql
 
 6. Backend installation and startup
 Inside `GamerConnectAPI`:
     npm install
     npm start
 
-If using nodemon for development:
+If you need hot reload for backend development:
     npm run dev
 
 7. Frontend installation and startup
@@ -52,6 +52,8 @@ Inside `gamerconnectmobile`:
 - Backend port: 3000
 - Database: GamerConnect
 - Environment file: `GamerConnectAPI/.env`
+- Default Docker database host: `gamerconnect-mysql`
+- Local database host: `localhost`
 - API host helpers:
   - `gamerconnectmobile/lib/services/api_host_nonweb.dart`
   - `gamerconnectmobile/lib/services/api_host_web.dart`
@@ -61,10 +63,12 @@ Inside `gamerconnectmobile`:
     SHOW TABLES;
 - Access API endpoint:
     http://localhost:3000/posts
+    http://localhost:3000/forums
 - Check backend logs:
     docker compose logs --tail 20 api
 
 10. Troubleshooting
-- If API returns 404 on `/posts`, rebuild/restart backend container
-- If database connection fails, verify MySQL service health
-- If Flutter cannot reach backend, verify emulator network and API base URL
+- If API returns 404 on `/posts` or `/forums`, restart the backend and confirm the route is mounted.
+- If database connection fails, verify MySQL service health and `GamerConnectAPI/.env` host settings.
+- If Flutter cannot reach backend, verify emulator network and API base URL.
+- When running the backend locally, update `DB_HOST=localhost` in `GamerConnectAPI/.env`.
