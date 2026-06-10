@@ -12,6 +12,7 @@ import 'screens/edit_profile_page.dart';
 import 'screens/evenement_page.dart';
 import 'screens/groupes_page.dart';
 import 'screens/actu_page.dart';
+import 'screens/forum_page.dart';
 import 'screens/trophies_page.dart';
 import 'screens/succes_page.dart';
 import 'route_observer.dart';
@@ -73,6 +74,7 @@ class GamerConnectApp extends StatelessWidget {
         '/actu': (context) => ActuPage(),
         '/succes': (context) => SuccesPage(),
         '/trophies': (context) => const TrophiesPage(),
+        '/forum': (context) => const ForumPage(),
       },
     );
   }

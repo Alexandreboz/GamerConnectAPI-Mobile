@@ -16,6 +16,8 @@ app.use("/actus", require("./routes/actus.routes"));
 app.use("/succes", require("./routes/succes.routes"));
 app.use("/posts", require("./routes/post.routes"));
 app.use("/messages", require("./routes/message.routes"));
+app.use("/forums", require("./routes/forums.routes"));
+console.log('✅ Loaded /forums routes');
 
 const db = require("./db");
 

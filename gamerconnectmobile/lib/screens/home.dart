@@ -7,6 +7,7 @@ import '../services/auth_service.dart';
 import 'profil.dart';
 import 'player_profile_page.dart';
 import 'evenement_page.dart';
+import 'forum_page.dart';
 import 'actu_page.dart';
 import 'trophies_page.dart';
 import 'groupes_page.dart';
@@ -574,6 +575,12 @@ class _HomePageState extends State<HomePage>
         'page': EvenementPage()
       },
       {
+        'label': 'FORUM',
+        'icon': Icons.forum_rounded,
+        'color': AppColors.primary,
+        'page': const ForumPage()
+      },
+      {
         'label': 'TROPHIES',
         'icon': Icons.emoji_events_rounded,
         'color': AppColors.gold,
@@ -838,7 +845,7 @@ class _HomePageState extends State<HomePage>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _navItem(Icons.home_filled, 0),
-            _navItem(Icons.groups_rounded, 1),
+            _navItem(Icons.forum_rounded, 1),
             const SizedBox(width: 60),
             _navItem(Icons.event_available_rounded, 2),
             _navItem(Icons.person_outline_rounded, 3),
@@ -857,7 +864,7 @@ class _HomePageState extends State<HomePage>
         });
         if (index == 1) {
           Navigator.push(
-              context, MaterialPageRoute(builder: (_) => GroupesPage()));
+              context, MaterialPageRoute(builder: (_) => const ForumPage()));
         }
         if (index == 2) {
           Navigator.push(

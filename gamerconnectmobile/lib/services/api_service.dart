@@ -100,6 +100,81 @@ class ApiService {
     return [];
   }
 
+  static Future<List<dynamic>> getForums() async {
+    final res = await http.get(Uri.parse('$_baseUrl/forums'));
+    if (res.statusCode == 200) return jsonDecode(res.body);
+    return [];
+  }
+
+  static Future<List<dynamic>> getForumMessages(int forumId,
+      {int page = 1, int limit = 20}) async {
+    final res = await http.get(Uri.parse(
+        '$_baseUrl/forums/$forumId/messages?page=$page&limit=$limit'));
+    if (res.statusCode == 200) return jsonDecode(res.body);
+    return [];
+  }
+
+  static Future<Map<String, dynamic>?> createForumMessage(
+      int userId, int forumId, String content) async {
+    final res = await http.post(
+      Uri.parse('$_baseUrl/forums/$forumId/messages'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'id_utilisateur': userId,
+        'contenu': content,
+      }),
+    );
+
+    if (res.statusCode == 201) return jsonDecode(res.body);
+    return null;
+  }
+
+  static Future<bool> deleteForumMessage(int messageId, int userId,
+      {bool asAdmin = false}) async {
+    final query = 'id_utilisateur=$userId${asAdmin ? '&admin=true' : ''}';
+    final res = await http.delete(
+      Uri.parse('$_baseUrl/forums/messages/$messageId?$query'),
+    );
+    return res.statusCode == 200;
+  }
+
+  static Future<Map<String, dynamic>> createForum(
+      String jeu, String description) async {
+    final res = await http.post(
+      Uri.parse('$_baseUrl/forums'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'jeu': jeu,
+        'description': description,
+      }),
+    );
+
+    if (res.statusCode == 201) {
+      return {'success': true};
+    }
+
+    var error = res.body.isNotEmpty ? res.body : 'Erreur inconnue';
+    try {
+      final parsed = jsonDecode(res.body);
+      if (parsed is Map<String, dynamic> && parsed.containsKey('error')) {
+        error = parsed['error']?.toString() ?? error;
+      }
+    } catch (_) {}
+
+    return {
+      'success': false,
+      'status': res.statusCode,
+      'error': error,
+    };
+  }
+
+  static Future<bool> deleteForum(int forumId) async {
+    final res = await http.delete(
+      Uri.parse('$_baseUrl/forums/$forumId?admin=true'),
+    );
+    return res.statusCode == 200;
+  }
+
   static Future<bool> rejoindreGroupe(int groupeId, int userId) async {
     // Check membership first
     final membres = await getMembresGroupe(groupeId);
