@@ -593,50 +593,71 @@ class _HomePageState extends State<HomePage>
         'page': GroupesPage()
       },
     ];
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.8,
-      children: items.asMap().entries.map((e) {
-        final i = e.key;
-        final item = e.value;
-        final color = item['color'] as Color;
-        return GestureDetector(
-          onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => item['page'] as Widget)),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: AppColors.cardGradient(color),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: color.withOpacity(0.3)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(item['icon'] as IconData, color: color, size: 22),
+
+    const buttonHeight = 112.0;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: _buildBentoItem(items[0], 0, buttonHeight)),
+            const SizedBox(width: 12),
+            Expanded(child: _buildBentoItem(items[1], 1, buttonHeight)),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(child: _buildBentoItem(items[2], 2, buttonHeight)),
+            const SizedBox(width: 12),
+            Expanded(child: _buildBentoItem(items[3], 3, buttonHeight)),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _buildBentoItem(items[4], 4, buttonHeight),
+      ],
+    );
+  }
+
+  Widget _buildBentoItem(Map<String, dynamic> item, int index, double height) {
+    final color = item['color'] as Color;
+
+    return SizedBox(
+      height: height,
+      child: GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => item['page'] as Widget),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.cardGradient(color),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: color.withOpacity(0.3)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(width: 10),
-                Text(
-                  item['label'] as String,
-                  style: AppStyles.label.copyWith(color: color, fontSize: 12),
-                ),
-              ],
-            ),
-          )
-              .animate()
-              .fadeIn(delay: Duration(milliseconds: 200 + i * 60))
-              .scale(begin: const Offset(0.9, 0.9)),
-        );
-      }).toList(),
+                child: Icon(item['icon'] as IconData, color: color, size: 22),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                item['label'] as String,
+                style: AppStyles.label.copyWith(color: color, fontSize: 12),
+              ),
+            ],
+          ),
+        )
+            .animate()
+            .fadeIn(delay: Duration(milliseconds: 200 + index * 60))
+            .scale(begin: const Offset(0.9, 0.9)),
+      ),
     );
   }
 
