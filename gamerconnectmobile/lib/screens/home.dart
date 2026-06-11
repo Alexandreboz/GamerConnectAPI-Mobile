@@ -885,7 +885,7 @@ class _HomePageState extends State<HomePage>
         });
         if (index == 1) {
           Navigator.push(
-              context, MaterialPageRoute(builder: (_) => const ForumPage()));
+              context, MaterialPageRoute(builder: (_) => GroupesPage()));
         }
         if (index == 2) {
           Navigator.push(
